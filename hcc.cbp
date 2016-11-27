@@ -34,6 +34,8 @@
 		</Compiler>
 		<Unit filename="lex.cpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="semantics.cpp" />
+		<Unit filename="semantics.h" />
 		<Unit filename="stdafx.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>

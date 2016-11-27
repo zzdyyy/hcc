@@ -2,17 +2,19 @@
 
 bool flg_lexonly = false;
 bool flg_syxonly = false;
+bool flg_tbl = false;
 istream *src_input = nullptr;
 ostream *lex_output = nullptr;
 ostream *syx_output = nullptr;
+ostream *tbl_output = nullptr;
 
 void usage()
 {
-    cout << "Usage: hcc [-l FILENAME] SOURCEFILE" << endl
+    cout << "Usage: hcc [-l FILENAME|-s FILENAME|-t FILENAME] SOURCEFILE" << endl
         << endl
         << "       Read extended C0 source code from SOURCEFILE file and do" << endl
-        << "       syntax analysis. The result will be output into stdout" << endl
-        << "       by default." << endl
+        << "       semantic analysis. The symbol table will be dumped into" << endl
+        << "       stdout by default." << endl
         << endl
         << "  -l FILENAME" <<endl
         << "       Only do lexical analysis and output the result to FILENAME." << endl
@@ -20,6 +22,10 @@ void usage()
         << endl
         << "  -s FILENAME" <<endl
         << "       Only do syntax analysis and output the result to FILENAME." << endl
+        << "       Assign FILENAME as - to indicate stdout." << endl
+        << endl
+        << "  -t FILENAME" <<endl
+        << "       Do semantic analysis and dump the symbol table to FILENAME." << endl
         << "       Assign FILENAME as - to indicate stdout." << endl
         << endl;
     exit(EXIT_FAILURE);
@@ -64,10 +70,11 @@ int main(int argc, char **argv)
     if (argc == 2)
     {
         src_input = open_input(argv[1]);
-        syx_output = open_output("-");
+        tbl_output = open_output("-");
         lex_init();
         syx_init();
         program();
+        tbl_dump();
         return 0;
     }
     if (argc == 4 && string(argv[1]) == "-l")
@@ -87,6 +94,17 @@ int main(int argc, char **argv)
         lex_init();
         syx_init();
         program();
+        return 0;
+    }
+    if (argc == 4 && string(argv[1]) == "-t")
+    {
+        flg_tbl = true;
+        src_input = open_input(argv[3]);
+        tbl_output = open_output(argv[2]);
+        lex_init();
+        syx_init();
+        program();
+        tbl_dump();
         return 0;
     }
     usage();

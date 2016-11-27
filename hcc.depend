@@ -13,10 +13,10 @@
 1479281060 source:e:\学习资料\大三上\编译技术\作业\作业3\hcc\main.cpp
 	"stdafx.h"
 
-1479353126 source:e:\学习资料\大三上\编译技术\作业\hcc\main.cpp
+1480272337 source:e:\学习资料\大三上\编译技术\作业\hcc\main.cpp
 	"stdafx.h"
 
-1480244276 e:\学习资料\大三上\编译技术\作业\hcc\stdafx.h
+1480269139 e:\学习资料\大三上\编译技术\作业\hcc\stdafx.h
 	<iostream>
 	<fstream>
 	<sstream>
@@ -26,8 +26,9 @@
 	<map>
 	<cstdlib>
 	<cassert>
+	"semantics.h"
 
-1480244341 source:e:\学习资料\大三上\编译技术\作业\hcc\lex.cpp
+1480249161 source:e:\学习资料\大三上\编译技术\作业\hcc\lex.cpp
 	"stdafx.h"
 
 1480230205 source:e:\学习资料\大三上\编译技术\作业\hcc\util.cpp
@@ -36,6 +37,11 @@
 1479352193 source:e:\学习资料\大三上\编译技术\作业\hcc\grammar.cpp
 	"stdafx.h"
 
-1480244639 source:e:\学习资料\大三上\编译技术\作业\hcc\syntax.cpp
+1480272870 source:e:\学习资料\大三上\编译技术\作业\hcc\syntax.cpp
+	"stdafx.h"
+
+1480272897 e:\学习资料\大三上\编译技术\作业\hcc\semantics.h
+
+1480272814 source:e:\学习资料\大三上\编译技术\作业\hcc\semantics.cpp
 	"stdafx.h"
 

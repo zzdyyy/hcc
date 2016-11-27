@@ -6,7 +6,7 @@ struct function_item{
     int paraamt;
     int rettyp;
 };
-vector<function_item> functbl;
+vector<function_item> old_functbl;
 
 void syx_out(string msg);
 void syx_init();
@@ -43,7 +43,7 @@ inline bool istype()
 
 bool isfunction(const string &idt)
 {
-    for(auto item : functbl)
+    for(auto item : old_functbl)
         if(item.funcname == idt)
             return true;
     return false;
@@ -51,7 +51,8 @@ bool isfunction(const string &idt)
 
 void syx_out(string msg)
 {
-    *syx_output << "SYNTAX: [Near line " << lc << ", col " << cc << "] " << msg << endl;
+    if(flg_syxonly)
+        *syx_output << "SYNTAX: [Near line " << lc << ", col " << cc << "] " << msg << endl;
 }
 
 void syx_init()
@@ -147,12 +148,12 @@ void program()
     }
     //TODO: checkmain() in sematic.
     syx_out("Program read finished.");
-    exit(EXIT_SUCCESS);
 }
 
 //read constant definition. assuming tkntyp == const_tk
 void constdef()
 {
+    string idt;
     int type = int_t;
     int consttype = int_t;
     int value = 0;
@@ -175,7 +176,8 @@ void constdef()
             ERROR("Expected an identifier.");
         }
         else
-            syx_out("name: " + tknstr);//TODO
+            idt = tknstr;
+        syx_out("name: " + idt);//TODO
         gettoken();
 
         if(tkntyp != assign_tk)
@@ -187,7 +189,7 @@ void constdef()
         constant(consttype, value);
         if(consttype != type)
             WARNING("The type of initial value mismatches with the const declaring.");
-        //TODO: save value...
+        insertobj(tblitem::CONST, idt, type, false, value);
         syx_out("init: " + tostr(value));
 
         if(tkntyp == comma_tk)
@@ -331,7 +333,7 @@ void funcdeftail(int type, string &idt)
     syx_out("Function declaration go on.");
 
     paralist(paraamt);
-    functbl.push_back(function_item{idt, paraamt, type});
+    old_functbl.push_back(function_item{idt, paraamt, type});
     cmpdstmts();
     syx_out("Function declaration end.");
 }
@@ -511,7 +513,7 @@ void factor()
 //return the type of function. AT: tkntyp == id_t(function)
 void funccall(int &type)
 {
-    for(auto item: functbl)
+    for(auto item: old_functbl)
         if(item.funcname == tknstr)
         {
             type = item.rettyp;

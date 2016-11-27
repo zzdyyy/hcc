@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cassert>
 using namespace std;
+typedef unsigned int uint;
 
 //token type constant definition
 enum token_t {
@@ -23,15 +24,17 @@ enum token_t {
 enum addsub_tk_v { addop, subop };      // + -
 enum multdiv_tk_v { multop, divop };    // * /
 enum rltop_tk_v { ltop, leop, gtop, geop, neqlop, eqlop };  // < <= > >= != ==
-enum type_t { void_t, int_t, char_t };
+enum type_t { void_t, int_t, char_t, string_t };
 
 
 //program level global declaration
 extern bool flg_lexonly;
 extern bool flg_syxonly;
+extern bool flg_tbl;
 extern istream *src_input;
 extern ostream *lex_output;
 extern ostream *syx_output;
+extern ostream *tbl_output;
 
 //lex level global declaration
 extern signed char ch; //last character
@@ -42,6 +45,8 @@ extern int tknval; //number value, operator subtype
 extern char tknchar;   //char literal
 extern string tknstr;  //string literal, identifier name
 
+//semantics level declaration
+#include "semantics.h"
 
 void lex_init();
 void gettoken();
