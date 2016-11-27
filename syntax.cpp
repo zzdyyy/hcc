@@ -123,7 +123,7 @@ void program()
 {
     int step=0;//0-const 1-var 2-func
 
-    while(true)
+    while(tkntyp != eof_tk)
     {
         switch(tkntyp)
         {
@@ -136,7 +136,6 @@ void program()
         case void_tk:
             step = 2;
             nfuncdef();
-            syx_out("Read a void func def.");
             break;
 
         default:
@@ -145,12 +144,8 @@ void program()
             else
                 ERROR("Expected declaration.");
         }
-        if(!functbl.empty() && functbl.back().funcname == "main")
-            break;
     }
-    function_item &themain = functbl.back();
-    if(themain.paraamt != 0 || themain.rettyp != void_t)
-        FATAL_ERROR("The prototype of main function must be \"void main()\".");
+    //TODO: checkmain() in sematic.
     syx_out("Program read finished.");
     exit(EXIT_SUCCESS);
 }
@@ -254,7 +249,7 @@ void declheader(bool allowfunc, int &step)
     else if(tkntyp == lbrkt_tk || tkntyp == comma_tk || tkntyp == semicln_tk)
     {
         if(step>1)
-            WARNING("Variable declaring after function declaring.");
+            WARNING("Variable declaring after function declaring / statement.");
         if(step<1)
             step = 1;
         vardeftail(type, idt);   //TODO: call with type and identifier
@@ -344,12 +339,14 @@ void funcdeftail(int type, string &idt)
 //AT: tkntype = void_t
 void nfuncdef()
 {
-    string idt("");
-    gettoken();
+    string idt;
+    syx_out("Void function definition begin.");
+    gettoken();//skip void
 
     if(tkntyp != id_tk)
         ERROR("Expected identifier.");
     idt = tknstr;
+    syx_out("name: " + idt);
     gettoken();
 
     if(tkntyp != lprt_tk)
@@ -417,7 +414,10 @@ void cmpdstmts()
             if(istype())//begins with type
                 declheader(false, step);
             else
+            {
+                step = 2;
                 statement();
+            }
         }
     }
     gettoken();
@@ -467,7 +467,7 @@ void factor()
     {
     case id_tk://variable
         //save the var
-            gettoken();
+        gettoken();
         if(tkntyp != lbrkt_tk)//simple variable
         {
             return;
@@ -481,6 +481,7 @@ void factor()
                 ERROR("Expected a right bracket.");
                 do { gettoken(); } while (tkntyp != rbrkt_tk);
             }
+            gettoken();
             return;
         }
 
@@ -532,11 +533,10 @@ void arglist()
         expression();
 
         if(tkntyp == comma_tk)
-            gettoken();
+            gettoken();//TODO: may cause that , is not needed
     }
 
-    if(tkntyp != rprt_tk)
-        ERROR("Expected right parenthesis.");
+    gettoken();
 }
 
 void statement()
@@ -545,9 +545,9 @@ void statement()
     {
         int rettyp;
         funccall(rettyp);
-        if(tkntyp != semicln_tk);
+        if(tkntyp != semicln_tk)
         {
-            ERROR("Expected semicolon.");
+            ERROR("Expected semicolon."+tostr(tkntyp));
             do { gettoken(); } while (tkntyp != semicln_tk);
         }
         gettoken();
@@ -612,6 +612,7 @@ void if_stmt()
     if(tkntyp != rprt_tk)
         ERROR("Expected right parenthesis.");
     gettoken();
+
     statement();
 }
 
@@ -633,6 +634,7 @@ void while_stmt()
     if(tkntyp != rprt_tk)
         ERROR("Expected right parenthesis.");
     gettoken();
+
     statement();
 }
 
@@ -702,11 +704,14 @@ void switch_stmt()
 void return_stmt()
 {
     gettoken();
-    expression();
+
+    if(tkntyp != semicln_tk)
+        expression();
 
     if(tkntyp != semicln_tk)
         ERROR("Expected semicolon.");
     gettoken();
+    syx_out("Return statement.");
 }
 
 void printf_stmt()
@@ -719,6 +724,7 @@ void printf_stmt()
 
     if(tkntyp == strlit_tk)
     {
+        //TODO:do something
         gettoken();
 
         if(tkntyp == comma_tk)
@@ -776,7 +782,7 @@ void assign_stmt()
     //save identifier
     gettoken();
 
-    if(tkntyp == lbrkt_tk)
+    if(tkntyp == lbrkt_tk)//array
     {
         gettoken();
 

@@ -17,7 +17,8 @@ enum token_t {
     chrlit_tk, strlit_tk, intlit_tk, id_tk, //complicate types
     const_tk, int_tk, char_tk, void_tk, if_tk, while_tk, switch_tk, case_tk, default_tk, return_tk,    //keywords
     semicln_tk, comma_tk, assign_tk, lbrkt_tk, rbrkt_tk, lprt_tk, rprt_tk, lbrc_tk, rbrc_tk, cln_tk,  //single signs
-    addsub_tk, multdiv_tk, rltop_tk     //operators
+    addsub_tk, multdiv_tk, rltop_tk,     //operators
+    eof_tk  //control token
 };
 enum addsub_tk_v { addop, subop };      // + -
 enum multdiv_tk_v { multop, divop };    // * /
@@ -33,7 +34,7 @@ extern ostream *lex_output;
 extern ostream *syx_output;
 
 //lex level global declaration
-extern char ch; //last character
+extern signed char ch; //last character
 extern int cc;  //character counter
 extern int lc;  //line counter
 extern int tkntyp; //token type

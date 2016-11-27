@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 //work variables
-char ch = ' ';    //last character, initialized with space
+signed char ch = ' ';    //last character, initialized with space
 int cc_start = 0; //character counter before the valid token
 int cc = 0; //character counter
 int lc = 1; //line counter
@@ -16,24 +16,21 @@ string tknstr;  //string literal, identifier name
 
 //Safely get char from src_input. When at EOF, return one more char and throw
 //exception at next calling. This function is aimed to handling the tail problem
-char getcs()
+signed char getcs()
 {
-    static bool iseof = false;
+    static int eofamt = 0;
     char c = ' ';
     if(*src_input)//there are more chars to read
     {
         src_input->get(c);
         return c;
     }
-    if(!iseof)
+    if(eofamt<2)
     {
-        iseof = true;
-        return ' ';
+        ++eofamt;
+        return -1;
     }
-    if(flg_lexonly)
-        throw(0);//TODO: NOT FULLY IMPLEMENTED
-    else
-        FATAL_ERROR("Source input incomplete.");//fatal error
+    FATAL_ERROR("Source input incomplete.");//fatal error
     return ' ';
 }
 
@@ -314,7 +311,14 @@ void gettoken()
             if(getchrlit())
                 return;
             break;
-        default://TODO:ERROR
+        default:
+            if(ch<0)
+            {
+                tkntyp = eof_tk;
+                ch = getcs(), ++cc;
+                return;
+            }
+            //TODO:ERROR
             ERROR("Unknown char code: "+tostr(int(ch)));
             ch = getcs(), ++cc;
         }
@@ -377,62 +381,58 @@ void lex_dump()
     signtype[rbrc_tk] = '}';
     signtype[cln_tk] = ':';
     out << left;
-    try
-    {
-        while(true)
-        {
-            ++cnt;
-            gettoken();
-            out << setw(4) << lc << setw(4) << cc_start << setw(4) << cc;
-            switch (tkntyp)
-            {
-            case const_tk: case int_tk: case char_tk:
-            case void_tk: case if_tk: case while_tk:
-            case case_tk: case default_tk: case return_tk:
-            case switch_tk:
-                out << setw(5) << cnt << " " << setw(12) << "Keyword" << "   "
-                    << tknstr << endl;
-                break;
-            case id_tk:
-                out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
-                    << tknstr << endl;
-                break;
-            case intlit_tk:
-                out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
-                    << tknval << endl;
-                break;
-            case chrlit_tk:
-                out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   '"
-                    << tknchar << "'" << endl;
-                break;
-            case strlit_tk:
-                out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   \""
-                    << tknstr << "\"" << endl;
-                break;
-            case semicln_tk: case comma_tk: case assign_tk: case lbrkt_tk:
-            case rbrkt_tk: case lprt_tk: case rprt_tk: case lbrc_tk:
-            case rbrc_tk: case cln_tk:
-                out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
-                    << signtype[tkntyp] << endl;
-                break;
-            case addsub_tk:
-                out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
-                    << (tknval == addop ? '+':'-') << endl;
-                break;
-            case multdiv_tk:
-                out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
-                    << (tknval == addop ? '*' : '/') << endl;
-                break;
-            case rltop_tk:
-                out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
-                    << rltoptypesign[tknval] << endl;
-                break;
-            }
 
-        }
-    }
-    catch(int i)
+    while(tkntyp!=eof_tk)
     {
-        out<<endl<<"Finished."<<endl;
+        ++cnt;
+        gettoken();
+        out << setw(4) << lc << setw(4) << cc_start << setw(4) << cc;
+        switch (tkntyp)
+        {
+        case const_tk: case int_tk: case char_tk:
+        case void_tk: case if_tk: case while_tk:
+        case case_tk: case default_tk: case return_tk:
+        case switch_tk:
+            out << setw(5) << cnt << " " << setw(12) << "Keyword" << "   "
+                << tknstr << endl;
+            break;
+        case id_tk:
+            out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
+                << tknstr << endl;
+            break;
+        case intlit_tk:
+            out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
+                << tknval << endl;
+            break;
+        case chrlit_tk:
+            out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   '"
+                << tknchar << "'" << endl;
+            break;
+        case strlit_tk:
+            out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   \""
+                << tknstr << "\"" << endl;
+            break;
+        case semicln_tk: case comma_tk: case assign_tk: case lbrkt_tk:
+        case rbrkt_tk: case lprt_tk: case rprt_tk: case lbrc_tk:
+        case rbrc_tk: case cln_tk:
+            out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
+                << signtype[tkntyp] << endl;
+            break;
+        case addsub_tk:
+            out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
+                << (tknval == addop ? '+':'-') << endl;
+            break;
+        case multdiv_tk:
+            out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
+                << (tknval == addop ? '*' : '/') << endl;
+            break;
+        case rltop_tk:
+            out << setw(5) << cnt << " " << setw(12) << tokentypename[tkntyp] << "   "
+                << rltoptypesign[tknval] << endl;
+            break;
+        case eof_tk:
+            out << setw(5) << cnt << " " << setw(12) << "EOF" << endl;
+            break;
+        }
     }
 }
