@@ -37,6 +37,8 @@
 		<Unit filename="stdafx.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="syntax.cpp" />
+		<Unit filename="util.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

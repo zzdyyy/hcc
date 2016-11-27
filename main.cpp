@@ -1,18 +1,25 @@
 #include "stdafx.h"
 
+bool flg_lexonly = false;
+bool flg_syxonly = false;
 istream *src_input = nullptr;
 ostream *lex_output = nullptr;
+ostream *syx_output = nullptr;
 
 void usage()
 {
     cout << "Usage: hcc [-l FILENAME] SOURCEFILE" << endl
         << endl
         << "       Read extended C0 source code from SOURCEFILE file and do" << endl
-        << "       lexical analysis. The result will be output into stdout" << endl
+        << "       syntax analysis. The result will be output into stdout" << endl
         << "       by default." << endl
         << endl
         << "  -l FILENAME" <<endl
         << "       Only do lexical analysis and output the result to FILENAME." << endl
+        << "       Assign FILENAME as - to indicate stdout." << endl
+        << endl
+        << "  -s FILENAME" <<endl
+        << "       Only do syntax analysis and output the result to FILENAME." << endl
         << "       Assign FILENAME as - to indicate stdout." << endl
         << endl;
     exit(EXIT_FAILURE);
@@ -57,17 +64,29 @@ int main(int argc, char **argv)
     if (argc == 2)
     {
         src_input = open_input(argv[1]);
-        lex_output = open_output("-");
+        syx_output = open_output("-");
         lex_init();
-        lex_dump();
+        syx_init();
+        program();
         return 0;
     }
     if (argc == 4 && string(argv[1]) == "-l")
     {
+        flg_lexonly = true;
         src_input = open_input(argv[3]);
         lex_output = open_output(argv[2]);
         lex_init();
         lex_dump();
+        return 0;
+    }
+    if (argc == 4 && string(argv[1]) == "-s")
+    {
+        flg_syxonly = true;
+        src_input = open_input(argv[3]);
+        syx_output = open_output(argv[2]);
+        lex_init();
+        syx_init();
+        program();
         return 0;
     }
     usage();

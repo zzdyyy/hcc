@@ -14,12 +14,6 @@ int tknval; //number value, operator subtype
 char tknchar;   //char literal
 string tknstr;  //string literal, identifier name
 
-//TODO: improve the error function
-void ERROR(string msg)
-{
-    cerr << "ERROR: [Near line " << lc << ", col " << cc << "] " << msg << endl;
-}
-
 //Safely get char from src_input. When at EOF, return one more char and throw
 //exception at next calling. This function is aimed to handling the tail problem
 char getcs()
@@ -36,7 +30,11 @@ char getcs()
         iseof = true;
         return ' ';
     }
-    throw(0);//TODO: NOT FULLY IMPLEMENTED
+    if(flg_lexonly)
+        throw(0);//TODO: NOT FULLY IMPLEMENTED
+    else
+        FATAL_ERROR("Source input incomplete.");//fatal error
+    return ' ';
 }
 
 void lex_init()
@@ -57,6 +55,7 @@ void lex_init()
     keyword[string("void")]    = void_tk;
     keyword[string("if")]      = if_tk;
     keyword[string("while")]   = while_tk;
+    keyword[string("switch")]    = switch_tk;
     keyword[string("case")]    = case_tk;
     keyword[string("default")] = default_tk;
     keyword[string("return")]  = return_tk;
@@ -316,7 +315,7 @@ void gettoken()
                 return;
             break;
         default://TODO:ERROR
-            ERROR(string("Unknow token: ")+ch);
+            ERROR("Unknown char code: "+tostr(int(ch)));
             ch = getcs(), ++cc;
         }
 
@@ -342,6 +341,7 @@ void lex_dump()
     tokentypename[void_tk] = string("KW: void");
     tokentypename[if_tk] = string("KW: if");
     tokentypename[while_tk] = string("KW: while");
+    tokentypename[switch_tk] = string("KW: switch");
     tokentypename[case_tk] = string("KW: case");
     tokentypename[default_tk] = string("KW: default");
     tokentypename[return_tk] = string("KW: return");
@@ -389,6 +389,7 @@ void lex_dump()
             case const_tk: case int_tk: case char_tk:
             case void_tk: case if_tk: case while_tk:
             case case_tk: case default_tk: case return_tk:
+            case switch_tk:
                 out << setw(5) << cnt << " " << setw(12) << "Keyword" << "   "
                     << tknstr << endl;
                 break;
