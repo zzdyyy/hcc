@@ -23,7 +23,7 @@ signed char getcs()
     if(*src_input)//there are more chars to read
     {
         src_input->get(c);
-        return c;
+        return (c>0)? c: ' ';
     }
     if(eofamt<2)
     {

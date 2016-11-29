@@ -13,27 +13,27 @@ void usage()
     cout << "Usage: hcc [-l FILENAME|-s FILENAME|-t FILENAME] SOURCEFILE" << endl
         << endl
         << "       Read extended C0 source code from SOURCEFILE file and do" << endl
-        << "       semantic analysis. The symbol table will be dumped into" << endl
-        << "       stdout by default." << endl
+        << "       semantic analysis. The relevant tables will be dumped into" << endl
+        << "       std-out by default." << endl
         << endl
         << "  -l FILENAME" <<endl
         << "       Only do lexical analysis and output the result to FILENAME." << endl
-        << "       Assign FILENAME as - to indicate stdout." << endl
+        << "       Assign FILENAME as - to indicate std-out." << endl
         << endl
         << "  -s FILENAME" <<endl
         << "       Only do syntax analysis and output the result to FILENAME." << endl
-        << "       Assign FILENAME as - to indicate stdout." << endl
+        << "       Assign FILENAME as - to indicate std-out." << endl
         << endl
         << "  -t FILENAME" <<endl
-        << "       Do semantic analysis and dump the symbol table to FILENAME." << endl
-        << "       Assign FILENAME as - to indicate stdout." << endl
+        << "       Do semantic analysis and dump the relevant tables to FILENAME." << endl
+        << "       Assign FILENAME as - to indicate std-out." << endl
         << endl;
     exit(EXIT_FAILURE);
 }
 
 istream *open_input(string fname)
 {
-    //from stdin
+    //from std-in
     if(fname == "-")
         return &cin;
 
@@ -43,14 +43,14 @@ istream *open_input(string fname)
         return inputfs;
     else
     {
-        cerr << "ERROR: Couldn't open input file." << endl;
+        cerr << "ERROR: Could not open input file." << endl;
         exit(EXIT_FAILURE);
     }
 }
 
 ostream *open_output(string fname)
 {
-    //to stdout
+    //to std-out
     if(fname == "-")
         return &cout;
 
@@ -60,7 +60,7 @@ ostream *open_output(string fname)
         return outputfs;
     else
     {
-        cerr << "ERROR: Couldn't open output file." << endl;
+        cerr << "ERROR: Could not open output file." << endl;
         exit(EXIT_FAILURE);
     }
 }

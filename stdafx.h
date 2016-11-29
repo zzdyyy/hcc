@@ -25,6 +25,7 @@ enum addsub_tk_v { addop, subop };      // + -
 enum multdiv_tk_v { multop, divop };    // * /
 enum rltop_tk_v { ltop, leop, gtop, geop, neqlop, eqlop };  // < <= > >= != ==
 enum type_t { void_t, int_t, char_t, string_t };
+extern int size_of[];
 
 
 //program level global declaration

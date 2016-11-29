@@ -13,10 +13,10 @@
 1479281060 source:e:\学习资料\大三上\编译技术\作业\作业3\hcc\main.cpp
 	"stdafx.h"
 
-1480272337 source:e:\学习资料\大三上\编译技术\作业\hcc\main.cpp
+1480401661 source:e:\学习资料\大三上\编译技术\作业\hcc\main.cpp
 	"stdafx.h"
 
-1480269139 e:\学习资料\大三上\编译技术\作业\hcc\stdafx.h
+1480403499 e:\学习资料\大三上\编译技术\作业\hcc\stdafx.h
 	<iostream>
 	<fstream>
 	<sstream>
@@ -28,7 +28,7 @@
 	<cassert>
 	"semantics.h"
 
-1480249161 source:e:\学习资料\大三上\编译技术\作业\hcc\lex.cpp
+1480409279 source:e:\学习资料\大三上\编译技术\作业\hcc\lex.cpp
 	"stdafx.h"
 
 1480230205 source:e:\学习资料\大三上\编译技术\作业\hcc\util.cpp
@@ -37,11 +37,11 @@
 1479352193 source:e:\学习资料\大三上\编译技术\作业\hcc\grammar.cpp
 	"stdafx.h"
 
-1480272870 source:e:\学习资料\大三上\编译技术\作业\hcc\syntax.cpp
+1480431713 source:e:\学习资料\大三上\编译技术\作业\hcc\syntax.cpp
 	"stdafx.h"
 
-1480272897 e:\学习资料\大三上\编译技术\作业\hcc\semantics.h
+1480431968 e:\学习资料\大三上\编译技术\作业\hcc\semantics.h
 
-1480272814 source:e:\学习资料\大三上\编译技术\作业\hcc\semantics.cpp
+1480431944 source:e:\学习资料\大三上\编译技术\作业\hcc\semantics.cpp
 	"stdafx.h"
 

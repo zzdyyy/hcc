@@ -1,12 +1,6 @@
 #include"stdafx.h"
 
 map<int, int> token_to_type;
-struct function_item{
-    string funcname;
-    int paraamt;
-    int rettyp;
-};
-vector<function_item> old_functbl;
 
 void syx_out(string msg);
 void syx_init();
@@ -24,7 +18,7 @@ void cmpdstmts();
 void expression();
 void term();
 void factor();
-void funccall(int &type);
+void funccall();
 void arglist();
 void statement();
 void if_stmt();
@@ -39,14 +33,6 @@ void assign_stmt();
 inline bool istype()
 {
     return (token_to_type.find(tkntyp) != token_to_type.end());
-}
-
-bool isfunction(const string &idt)
-{
-    for(auto item : old_functbl)
-        if(item.funcname == idt)
-            return true;
-    return false;
 }
 
 void syx_out(string msg)
@@ -189,7 +175,7 @@ void constdef()
         constant(consttype, value);
         if(consttype != type)
             WARNING("The type of initial value mismatches with the const declaring.");
-        insertobj(tblitem::CONST, idt, type, false, value);
+        insertobj(tblitem::CONST, idt, type, false, value);//SMT
         syx_out("init: " + tostr(value));
 
         if(tkntyp == comma_tk)
@@ -246,7 +232,9 @@ void declheader(bool allowfunc, int &step)
             return;
         }
         step = 2;
-        funcdeftail(type, idt); //TODO: call with type and identifier
+        buildcontext(type, idt);//SMT
+        funcdeftail(type, idt);
+        exitcontext();//SMT
     }
     else if(tkntyp == lbrkt_tk || tkntyp == comma_tk || tkntyp == semicln_tk)
     {
@@ -264,8 +252,9 @@ void declheader(bool allowfunc, int &step)
 }
 
 //read var defs. assuming that tkntyp == lbrkt|comma|semicolon
-void vardeftail(int type, string &idt)
+void vardeftail(int type, string &firstidt)
 {
+    string idt(firstidt);
     int sz = 0;//size of an array
     syx_out("Variable declaration go on.");
 
@@ -285,15 +274,18 @@ void vardeftail(int type, string &idt)
             syx_out("array, size: " + tostr(sz));
             gettoken();// get ]
         }
+        insertobj(tblitem::VAR, idt, type, true, sz);//SMT
         gettoken();
     }
-    //TODO
+    else
+        insertobj(tblitem::VAR, idt, type, false, tblitem::NOUSE);//SMT
+
     while(tkntyp == comma_tk)
     {
         gettoken();
         if(tkntyp != id_tk)
             ERROR("Expected an identifier.");
-        //TODO: save the id
+        idt = tknstr;//SMT
         syx_out("name: " + tostr(tknstr));
         gettoken();
 
@@ -313,9 +305,11 @@ void vardeftail(int type, string &idt)
                 syx_out("array, size: " + tostr(sz));
                 gettoken();// get ]
             }
+            insertobj(tblitem::VAR, idt, type, true, sz);//SMT
             gettoken();
         }
-        //TODO
+        else
+            insertobj(tblitem::VAR, idt, type, false, tblitem::NOUSE);//SMT
     }
     if(tkntyp != semicln_tk)
     {
@@ -333,7 +327,7 @@ void funcdeftail(int type, string &idt)
     syx_out("Function declaration go on.");
 
     paralist(paraamt);
-    old_functbl.push_back(function_item{idt, paraamt, type});
+
     cmpdstmts();
     syx_out("Function declaration end.");
 }
@@ -353,7 +347,10 @@ void nfuncdef()
 
     if(tkntyp != lprt_tk)
         ERROR("Void function needs parameter list.");
+
+    buildcontext(void_t, idt);//SMT
     funcdeftail(void_t, idt);
+    exitcontext();//SMT
 }
 
 //output the para amount
@@ -374,6 +371,7 @@ void paralist(int &paraamt)
         if(!istype() || tkntyp == void_tk)// tkntyp is not a non-void type
         {
             ERROR("Expected a non-void type.");
+            type = int_t;
             gettoken();
         }
         else
@@ -383,6 +381,7 @@ void paralist(int &paraamt)
         if(tkntyp != id_tk)
             ERROR("Expected identifier.");
         idt = tknstr;
+        insertpara(type, idt);//SMT
         syx_out("name: "+idt);
         //...
 
@@ -460,7 +459,8 @@ void factor()
 
     if(tkntyp == id_tk && isfunction(tknstr))//is a function
     {
-        funccall(type);
+        type = getitem(foundopr).datatype;
+        funccall();
         if(type == void_t)
             ERROR("Function call in a expression cannot return void value.");
         return;
@@ -511,14 +511,9 @@ void factor()
 }
 
 //return the type of function. AT: tkntyp == id_t(function)
-void funccall(int &type)
+void funccall()
 {
-    for(auto item: old_functbl)
-        if(item.funcname == tknstr)
-        {
-            type = item.rettyp;
-            break;
-        }
+
     gettoken();
 
     arglist();//TODO: return length, compare with declaration
@@ -545,8 +540,8 @@ void statement()
 {
     if(tkntyp == id_tk && isfunction(tknstr))//function call
     {
-        int rettyp;
-        funccall(rettyp);
+        int rettyp = getitem(foundopr).datatype;
+        funccall();
         if(tkntyp != semicln_tk)
         {
             ERROR("Expected semicolon."+tostr(tkntyp));
