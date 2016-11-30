@@ -15,15 +15,15 @@ void funcdeftail(int type, string &idt);
 void nfuncdef();
 void paralist(int &paraamt);
 void cmpdstmts();
-void expression();
-void term();
-void factor();
-void funccall();
-void arglist();
+qoperand expression();
+qoperand term();
+qoperand factor();
+qoperand funccall();
+void arglist(int argn);
 void statement();
 void if_stmt();
 void while_stmt();
-void condition();
+void condition(qoperand lblend);
 void switch_stmt();
 void return_stmt();
 void printf_stmt();
@@ -424,113 +424,161 @@ void cmpdstmts()
     gettoken();
 }
 
-void expression()
+qoperand expression()
 {
-    if(tkntyp == addsub_tk)
+    bool isneg = false;
+    if(tkntyp == addsub_tk && tknval == subop)
     {
-        //...
+        isneg = true;
         gettoken();
     }
 
-    term();
+    qoperand t1 = term();
+    if(isneg)
+        t1 = neg(t1);
     while(tkntyp == addsub_tk)
     {
+        int op = tknval;
         gettoken();
-
-        term();
+        qoperand t2 = term();
+        t1 = addsub(op, t1, t2);
     }
+
+    return t1;
 }
 
-void term()
+qoperand term()
 {
-    factor();
+    qoperand f1 = factor();
+
     while(tkntyp == multdiv_tk)
     {
+        int op = tknval;
         gettoken();
-
-        factor();
+        qoperand f2 = factor();
+        f1 = muldiv(op, f1, f2);
     }
+
+    return f1;
 }
 
-void factor()
+qoperand factor()
 {
+    string idt;
     int type = int_t;
     int value = 0;
 
-    if(tkntyp == id_tk && isfunction(tknstr))//is a function
+    if(tkntyp == id_tk && isfunction(tknstr))//is a function TODO
     {
         type = getitem(foundopr).datatype;
-        funccall();
         if(type == void_t)
             ERROR("Function call in a expression cannot return void value.");
-        return;
+        qoperand retval = funccall();
+        return retval;
     }
     switch(tkntyp)
     {
     case id_tk://variable
-        //save the var
+        idt = tknstr;
         gettoken();
         if(tkntyp != lbrkt_tk)//simple variable
         {
-            return;
+            findidt(idt);
+            qoperand f = foundopr;
+            if(getitem(f).isarray)//SMT
+                ERROR("Factor cannot be an array.");
+            return foundopr;
         }
         else
         {
             gettoken();
-            expression();
+            qoperand index = expression();
+            findidt(idt);
+            qoperand arrayopr = foundopr;
+            qoperand elem = arrayload(arrayopr, index);
+
             if(tkntyp != rbrkt_tk)
             {
                 ERROR("Expected a right bracket.");
                 do { gettoken(); } while (tkntyp != rbrkt_tk);
             }
             gettoken();
-            return;
+            return elem;
         }
 
     case lprt_tk://(expr)
-        gettoken();
-        expression();
-        if(tkntyp != rprt_tk)
         {
-            ERROR("Expected a right parenthesis.");
-            do { gettoken(); } while (tkntyp != rprt_tk);
+            gettoken();
+            qoperand result = expression();
+            if(tkntyp != rprt_tk)
+            {
+                ERROR("Expected a right parenthesis.");
+                do { gettoken(); } while (tkntyp != rprt_tk);
+            }
+            gettoken();
+            return result;
         }
-        gettoken();
-        return;
 
     //constant
     case chrlit_tk:
     case addsub_tk:
     case intlit_tk:
-        constant(type, value);
-        return;
+        {
+            constant(type, value);
+            if(type == char_t)
+                return qoperand{qoperand::IMDCHAR, value};
+            else
+                return qoperand{qoperand::IMDINT, value};
+        }
 
     default:
         ERROR("Not a valid factor.");
     }
+    return BLANKOP;
 }
 
 //return the type of function. AT: tkntyp == id_t(function)
-void funccall()
+qoperand funccall()
 {
+    string idt=tknstr;
+    findidt(idt);
+    qoperand func = foundopr;
+    int argn = functbl[getitem(foundopr).value].argnum;
 
     gettoken();
+    arglist(argn);
 
-    arglist();//TODO: return length, compare with declaration
+    return call(func);
 }
 
-void arglist()
+void arglist(int argn)
 {
     if(tkntyp != lprt_tk)
         ERROR("Expected argument list.");
     gettoken();
 
+    vector<qoperand> args;
+    int argc = 0;
     while(tkntyp != rprt_tk)
     {
-        expression();
+        qoperand arg = expression();
+        ++argc;
+        if(argc > argn)
+        {
+            WARNING("Arguments are too many compared with the declaration: "+tostr(argn));
+            break;
+        }
+        args.push_back(arg);
 
         if(tkntyp == comma_tk)
             gettoken();//TODO: may cause that , is not needed
+    }
+    if(argc < argn)
+        ERROR("Arguments less than declaration: "+tostr(argn));
+    while(!args.empty())
+    {
+        push(args.back());
+        args.pop_back();
     }
 
     gettoken();
@@ -540,7 +588,7 @@ void statement()
 {
     if(tkntyp == id_tk && isfunction(tknstr))//function call
     {
-        int rettyp = getitem(foundopr).datatype;
+        /*int rettyp = getitem(foundopr).datatype; TODO*/
         funccall();
         if(tkntyp != semicln_tk)
         {
@@ -604,13 +652,15 @@ void if_stmt()
     {
         ERROR("Condition cannot be empty.");
     }
-    condition();
+    qoperand lblend = newlabel();
+    condition(lblend);
 
     if(tkntyp != rprt_tk)
         ERROR("Expected right parenthesis.");
     gettoken();
 
     statement();
+    setlabel(lblend);
 }
 
 //AT: tkntyp == if
@@ -626,24 +676,35 @@ void while_stmt()
     {
         ERROR("Condition cannot be empty.");
     }
-    condition();
+    qoperand lblbegin = newlabel();
+    setlabel(lblbegin);
+    qoperand lblend = newlabel();
+    condition(lblend);
 
     if(tkntyp != rprt_tk)
         ERROR("Expected right parenthesis.");
     gettoken();
 
     statement();
+    jmp(lblbegin);
+    setlabel(lblend);
 }
 
-void condition()
+void condition(qoperand lblend)
 {
-    expression();
+    qoperand e1 = expression();
 
     if(tkntyp != rltop_tk)
+    {
+        jz(e1, lblend);
         return;
+    }
+    int op = tknval;
     gettoken();
 
-    expression();
+    qoperand e2 = expression();
+    jifnot(op, e1, e2, lblend);
+    return;
 }
 
 void switch_stmt()
@@ -658,16 +719,21 @@ void switch_stmt()
     {
         ERROR("Expected expression.");
     }
-    expression();
+    qoperand e = expression();
 
     if(tkntyp != rprt_tk)
         ERROR("Expected right parenthesis.");
     gettoken();
 
+    qoperand lblend = newlabel();//SMT
+    qoperand lblnext = newlabel();//SMT
+
     if(tkntyp != lbrc_tk)
         ERROR("Expected left brace.");
     gettoken();
 
+    if(tkntyp != case_tk)
+        ERROR("Expected keyword: case");
     do
     {
         gettoken();
@@ -675,11 +741,21 @@ void switch_stmt()
         int type = int_t, value = 0;
         constant(type,value);
 
+        //SMT
+        qoperand v;
+        if(type == char_t)
+            v = qoperand{qoperand::IMDCHAR, value};
+        else
+            v = qoperand{qoperand::IMDINT, value};
+        setlabel(lblnext); lblnext = newlabel();
+        jifnot(eqlop, e, v, lblnext);
+
         if(tkntyp != cln_tk)
         ERROR("Expected colon.");
         gettoken();
 
         statement();
+        jmp(lblend);//SMT
 
     }while(tkntyp == case_tk);
 
@@ -691,23 +767,37 @@ void switch_stmt()
         ERROR("Expected colon.");
         gettoken();
 
+        setlabel(lblnext);
         statement();
+        jmp(lblend);
+    }
+    else
+    {
+        setlabel(lblnext);
+        jmp(lblend);
     }
 
-
+    setlabel(lblend);
     gettoken();
 }
 
 void return_stmt()
 {
+    bool ret_with_value = false;
+    qoperand retval;
     gettoken();
 
     if(tkntyp != semicln_tk)
-        expression();
+    {
+        retval = expression();
+        ret_with_value = true;
+    }
 
     if(tkntyp != semicln_tk)
         ERROR("Expected semicolon.");
     gettoken();
+
+    ret(ret_with_value, retval);//SMT
     syx_out("Return statement.");
 }
 
@@ -719,25 +809,24 @@ void printf_stmt()
         ERROR("Expected left parenthesis.");
     gettoken();
 
-    if(tkntyp == strlit_tk)
+    while(tkntyp !=rprt_tk)
     {
-        //TODO:do something
-        gettoken();
+        if(tkntyp == strlit_tk)
+        {
+            qoperand str = insertstr(tknstr);
+            wr(str);//SMT
+            gettoken();
+        }
+        else
+        {
+            qoperand e = expression();
+            wr(e);//SMT
+        }
 
         if(tkntyp == comma_tk)
-        {
             gettoken();
-
-            expression();
-        }
-    }
-    else
-    {
-        expression();
     }
 
-    if(tkntyp != rprt_tk)
-        ERROR("Expected right parenthesis.");
     gettoken();
 
     if(tkntyp != semicln_tk)
@@ -753,11 +842,14 @@ void scanf_stmt()
         ERROR("Expected left parenthesis.");
     gettoken();
 
-    if(tkntyp != id_tk)
-        ERROR("Expected identifier.");
     do
     {
-        //...
+        if(tkntyp != id_tk)
+            ERROR("Expected identifier.");
+        string idt = tknstr;
+        findidt(idt);
+        qoperand opr = foundopr;
+        rd(opr);//SMT
         gettoken();
 
         if(tkntyp == comma_tk)
@@ -774,16 +866,22 @@ void scanf_stmt()
     gettoken();
 }
 
-void assign_stmt()
+//identifier must be non-function, it may be array
+void assign_stmt()  //TODO: disallow constant assignment
 {
-    //save identifier
+    bool isarray = false;
+    qoperand index;
+    qoperand value;
+
+    string idt = tknstr;
     gettoken();
 
     if(tkntyp == lbrkt_tk)//array
     {
-        gettoken();
+        isarray = true;
 
-        expression();
+        gettoken();
+        index = expression();
 
         if(tkntyp != rbrkt_tk)
             ERROR("Expected a right bracket.");
@@ -794,7 +892,18 @@ void assign_stmt()
         ERROR("Expected assignment sign.");
     gettoken();
 
-    expression();
+    value = expression();
+
+    findidt(idt);
+    qoperand opr = foundopr;
+    if(isarray)
+    {
+        arrayass(opr, index, value);
+    }
+    else
+    {
+        assign(opr, value);
+    }
 
     if(tkntyp != semicln_tk)
         ERROR("Expected semicolon.");

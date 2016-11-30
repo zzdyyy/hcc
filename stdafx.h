@@ -70,4 +70,5 @@ string tostr(const T &x)
     ERROR("error in to_string");
     return "(error)";
 }
+
 #endif // STDAFX_H_INCLUDED

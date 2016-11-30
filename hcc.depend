@@ -16,7 +16,7 @@
 1480401661 source:e:\学习资料\大三上\编译技术\作业\hcc\main.cpp
 	"stdafx.h"
 
-1480403499 e:\学习资料\大三上\编译技术\作业\hcc\stdafx.h
+1480440062 e:\学习资料\大三上\编译技术\作业\hcc\stdafx.h
 	<iostream>
 	<fstream>
 	<sstream>
@@ -37,11 +37,11 @@
 1479352193 source:e:\学习资料\大三上\编译技术\作业\hcc\grammar.cpp
 	"stdafx.h"
 
-1480431713 source:e:\学习资料\大三上\编译技术\作业\hcc\syntax.cpp
+1480501499 source:e:\学习资料\大三上\编译技术\作业\hcc\syntax.cpp
 	"stdafx.h"
 
-1480431968 e:\学习资料\大三上\编译技术\作业\hcc\semantics.h
+1480499913 e:\学习资料\大三上\编译技术\作业\hcc\semantics.h
 
-1480431944 source:e:\学习资料\大三上\编译技术\作业\hcc\semantics.cpp
+1480501112 source:e:\学习资料\大三上\编译技术\作业\hcc\semantics.cpp
 	"stdafx.h"
 
