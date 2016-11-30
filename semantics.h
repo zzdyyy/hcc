@@ -77,6 +77,7 @@ void rd(qoperand opr);
 qoperand insertstr(const string &str);
 void wr(qoperand opr);
 qoperand newlabel();
+void checkmain();
 static inline tblitem &getitem(qoperand opr)
 {
     return (opr.type == qoperand::GLB_OBJ)?

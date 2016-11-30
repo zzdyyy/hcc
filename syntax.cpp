@@ -132,7 +132,7 @@ void program()
                 ERROR("Expected declaration.");
         }
     }
-    //TODO: checkmain() in sematic.
+    checkmain();
     syx_out("Program read finished.");
 }
 
@@ -427,9 +427,10 @@ void cmpdstmts()
 qoperand expression()
 {
     bool isneg = false;
-    if(tkntyp == addsub_tk && tknval == subop)
+    if(tkntyp == addsub_tk)
     {
-        isneg = true;
+        if(tknval == subop)
+            isneg = true;
         gettoken();
     }
 

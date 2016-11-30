@@ -34,14 +34,15 @@ int findlcl(const string &nm)
 
 bool findidt(const string &nm)
 {
-    assert(context>=0);
     int idx = 0;
-
-    idx = findlcl(nm);
-    if(idx >= 0)//found in local
+    if(context>=0)
     {
-        foundopr = qoperand{qoperand::LCL_OBJ, idx};
-        return true;
+        idx = findlcl(nm);
+        if(idx >= 0)//found in local
+        {
+            foundopr = qoperand{qoperand::LCL_OBJ, idx};
+            return true;
+        }
     }
     idx = findglb(nm);
     if(idx >= 0)//found in global
@@ -291,7 +292,25 @@ void wr(qoperand opr)
     emitqi(qi{qi::WR, opr, BLANKOP, BLANKOP});
 }
 
-
+void checkmain()
+{
+    if(! findidt(string("main")))
+    {
+        ERROR("main() is not defined.");
+        return;
+    }
+    tblitem &item = getitem(foundopr);
+    if(item.datatype != void_t || functbl[item.value].argnum>0)
+    {
+        cerr<<functbl[item.value].argnum;
+        ERROR("Prototype of main() must be \"void main()\".");
+        return;
+    }
+    if(!functbl.empty() && glbtbl[functbl.back().index].name != "main")
+    {
+        WARNING("Functions defined after main() is of no use.");
+    }
+}
 
 
 
