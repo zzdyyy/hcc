@@ -6,7 +6,7 @@ vector<funcitem> functbl;//function table
 
 qoperand foundopr = qoperand{ qoperand::GLB_OBJ, -1 };//found result by findidt()
 int context = -1;//the function context (index of functbl), <0 means not in a function context
-int size_of[] = { 0, 4, 1, 0};//the size of void_t, int_t, char_t and string_t
+int size_of[] = { 0, 4, 1 };//the size of void_t, int_t, char_t and string_t
 
 //variables used only in this source file
 int local_addr = 0;//address offset of object in stack frame

@@ -7,14 +7,20 @@ istream *src_input = nullptr;
 ostream *lex_output = nullptr;
 ostream *syx_output = nullptr;
 ostream *tbl_output = nullptr;
+ostream *asm_output = nullptr;
 
 void usage()
 {
-    cout << "Usage: hcc [-l FILENAME|-s FILENAME|-t FILENAME] SOURCEFILE" << endl
+    cout << "Usage: hcc [-c FILENAME|-l FILENAME|-s FILENAME|" << endl
+        << "            -t FILENAME] SOURCEFILE" << endl
         << endl
-        << "       Read extended C0 source code from SOURCEFILE file and do" << endl
-        << "       semantic analysis. The relevant tables will be dumped into" << endl
+        << "       Read extended C0 source code from SOURCEFILE file and compile" << endl
+        << "       to MASM source code. The generated code will be output into" << endl
         << "       std-out by default." << endl
+        << endl
+        << "  -c FILENAME" <<endl
+        << "       Output the generated code to FILENAME. Assign FILENAME as - to" << endl
+        << "       indicate std-out." << endl
         << endl
         << "  -l FILENAME" <<endl
         << "       Only do lexical analysis and output the result to FILENAME." << endl
@@ -70,11 +76,11 @@ int main(int argc, char **argv)
     if (argc == 2)
     {
         src_input = open_input(argv[1]);
-        tbl_output = open_output("-");
+        asm_output = open_output("-");
         lex_init();
         syx_init();
         program();
-        tbl_dump();
+        genasm();
         return 0;
     }
     if (argc == 4 && string(argv[1]) == "-l")
@@ -105,6 +111,16 @@ int main(int argc, char **argv)
         syx_init();
         program();
         tbl_dump();
+        return 0;
+    }
+    if (argc == 4 && string(argv[1]) == "-c")
+    {
+        src_input = open_input(argv[3]);
+        asm_output = open_output(argv[2]);
+        lex_init();
+        syx_init();
+        program();
+        genasm();
         return 0;
     }
     usage();

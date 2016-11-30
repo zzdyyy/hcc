@@ -36,6 +36,7 @@ extern istream *src_input;
 extern ostream *lex_output;
 extern ostream *syx_output;
 extern ostream *tbl_output;
+extern ostream *asm_output;
 
 //lex level global declaration
 extern signed char ch; //last character
@@ -55,6 +56,8 @@ void lex_dump();
 
 void syx_init();
 void program();
+
+void genasm();
 
 void WARNING(string msg);
 void ERROR(string msg);
