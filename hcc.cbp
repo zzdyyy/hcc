@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters=" - " />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -32,6 +33,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="genasm.cpp" />
 		<Unit filename="lex.cpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="semantics.cpp" />
