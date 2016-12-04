@@ -48,3 +48,36 @@
 1480537419 source:e:\学习资料\大三上\编译技术\作业\hcc\genasm.cpp
 	"stdafx.h"
 
+1480868330 source:e:\hcc\lex.cpp
+	"stdafx.h"
+
+1480868696 e:\hcc\stdafx.h
+	<iostream>
+	<fstream>
+	<sstream>
+	<iomanip>
+	<string>
+	<vector>
+	<map>
+	<cstdlib>
+	<cassert>
+	<climits>
+	"semantics.h"
+
+1480512818 e:\hcc\semantics.h
+
+1480870378 source:e:\hcc\main.cpp
+	"stdafx.h"
+
+1480868915 source:e:\hcc\syntax.cpp
+	"stdafx.h"
+
+1480869080 source:e:\hcc\util.cpp
+	"stdafx.h"
+
+1480873394 source:e:\hcc\semantics.cpp
+	"stdafx.h"
+
+1480857041 source:e:\hcc\genasm.cpp
+	"stdafx.h"
+

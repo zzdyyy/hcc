@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+#define PRINTF_NEWLINE
+#undef PRINTF_NEWLINE
+
+
 static ostringstream out;
 static funcitem *fitem = nullptr;
 
@@ -16,7 +20,7 @@ void genheader()
 
 void gendataseg()
 {
-    string type_name[] = {"", "dd", "db"}; //define double-word/byte
+    string type_name[] = {"", "dd", "dd"}; //define double-word/byte
     out << ".data" << endl;
 
     //all global const and vars
@@ -25,7 +29,7 @@ void gendataseg()
         if(item.objtype == tblitem::FUNCTION)
             continue;
         bool isconst = (item.objtype == tblitem::CONST);
-        out << "    " << "align " << size_of[item.datatype] << endl;
+        //out << "    " << "align " << size_of[item.datatype] << endl;
         out << "    _" << item.name << " " << type_name[item.datatype] << " ";
         if(item.isarray)
             out << item.value << " dup(0)" <<endl;
@@ -85,7 +89,7 @@ string addrstr(qoperand qo)
                 + "]";
     else
         return "DWORD PTR [ebp-"
-                +tostr(4+ti.addr)//the first local var is [ebp-4]
+                +tostr(4+ti.addr)//the first local var is [ebp-4] TODO: this is not compatible with size[char_t]=1(compact store)
                 +"]";
 }
 
@@ -123,11 +127,11 @@ void gencodeseg()
             << "    sub   esp, " << fi.varsize+fi.tmpamt*4 << endl;
         //set value for constant first
         int i = 0;
-        for(tblitem ti: functbl[context].lcltbl)
+        for(tblitem &cti: functbl[context].lcltbl)
         {
-            if(ti.objtype == tblitem::CONST)
+            if(cti.objtype == tblitem::CONST)
                 out << "    mov   "<<addrstr(qoperand{qoperand::LCL_OBJ, i})
-                    << ", " << ti.value <<endl;
+                    << ", " << cti.value <<endl;
             ++i;
         }
         //generate asm for statements
@@ -157,6 +161,9 @@ void gencodeseg()
                     else
                         out<<"    invoke crt_printf,addr fmtd,eax"<<endl;
                 }
+                #ifdef PRINTF_NEWLINE
+                out<<"    invoke crt_printf,addr fmts,addr fmtnl"<<endl;
+                #endif // PRINTF_NEWLINE
                 break;
 
             case qi::RD:
@@ -230,7 +237,8 @@ void gencodeseg()
             case qi::DIV:
                 out<<"    mov   eax, "<<addrstr(q.A)<<endl;
                 out<<"    cdq"<<endl;
-                out<<"    idiv  "<<addrstr(q.B)<<endl;
+                out<<"    mov   ecx, "<<addrstr(q.B)<<endl;
+                out<<"    idiv  ecx"<<endl;
                 out<<"    mov   "<<addrstr(q.D)<<", eax"<<endl;
                 break;
 

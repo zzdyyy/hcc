@@ -134,6 +134,11 @@ void program()
     }
     checkmain();
     syx_out("Program read finished.");
+    if(errcnt!=0)
+    {
+        cerr << "hcc terminated due to the error(s) before." << endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 //read constant definition. assuming tkntyp == const_tk

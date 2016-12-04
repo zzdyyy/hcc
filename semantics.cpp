@@ -6,7 +6,7 @@ vector<funcitem> functbl;//function table
 
 qoperand foundopr = qoperand{ qoperand::GLB_OBJ, -1 };//found result by findidt()
 int context = -1;//the function context (index of functbl), <0 means not in a function context
-int size_of[] = { 0, 4, 1 };//the size of void_t, int_t, char_t and string_t
+int size_of[] = { 0, 4, 4 };//the size of void_t, int_t, char_t and string_t
 
 //variables used only in this source file
 int local_addr = 0;//address offset of object in stack frame
@@ -75,7 +75,6 @@ bool insertobj(int objtyp, const string& nm, int typ, bool isarray, int val)
     {
         if(findglb(nm)>=0)//found object in table
         {
-            tbl_dump();
             ERROR("Multi definition: " + nm);
             return false;
         }
@@ -86,7 +85,7 @@ bool insertobj(int objtyp, const string& nm, int typ, bool isarray, int val)
     {
         if(findlcl(nm)>=0)
         {
-            tbl_dump();
+            //tbl_dump();
             ERROR("Multi definition: " + nm);
             return false;
         }
@@ -108,7 +107,7 @@ bool insertpara(int typ, const string &nm)
     assert(context >= 0);//in a function context
     if(findlcl(nm)>=0)
     {
-        tbl_dump();
+        //tbl_dump();
         ERROR("Multi definition: " + nm);
         return false;
     }
@@ -123,7 +122,10 @@ void buildcontext(int rettyp, const string& nm)
     assert(context < 0);
     int idx = functbl.size();
     if(!insertobj(tblitem::FUNCTION, nm, rettyp, false, idx))
-        ;//TODO: throw a exception out to function declaration
+    {
+        ERROR("Id redefined.");
+        exit(EXIT_FAILURE);
+    }//TODO: throw a exception out to function declaration
 
     functbl.push_back(funcitem{int(glbtbl.size())-1, 0, 0, 0,});
     context = idx;
