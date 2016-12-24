@@ -119,9 +119,9 @@ bool getchrlit()
         return true;
     }
     tknchar = ch;
-    if(!(ch == '+' || ch == '*' || ch == '_' || (ch >= 'a' && ch <='z') ||
+    if(!(ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '_' || (ch >= 'a' && ch <='z') ||
           (ch >= 'A' && ch <='Z') || (ch >= '0' && ch <='9')))
-        ERROR("This char isn't valid.");//TODO:ERROR( char set isn't allowed)
+        WARNING("This char is out of standard.");//TODO:ERROR( char set isn't allowed)
     ch = getcs(), ++cc;
     if(ch != '\'' && ch != '\n')
         ERROR("Char iteral is too long.");//TODO:ERROR( literal is too long )
@@ -141,16 +141,21 @@ bool getchrlit()
 //read integer literal. assuming that ch is the first digit
 bool getintlit()
 {
+    bool isoverflow = false;
     tknval = (ch - '0');
     ch = getcs(), ++cc;
     if(tknval == 0 && ch >= '0' && ch <='9')//number start with 0
         ERROR("Number cannot be started with 0.");//TODO:ERROR( number cannot be started with 0
     while(ch >= '0' && ch <='9')
     {
+        if(tknval > (INT_MAX-(ch - '0'))/10 )
+            isoverflow = true;
         tknval *= 10;
         tknval += (ch - '0');
         ch = getcs(), ++cc;
     }
+    if(isoverflow)
+        WARNING("Integer literal overflows.");
     return true;
 }
 

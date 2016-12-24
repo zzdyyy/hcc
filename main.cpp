@@ -73,6 +73,7 @@ ostream *open_output(string fname)
 
 int main(int argc, char **argv)
 {
+    set_terminate(handler);
     if (argc == 2)
     {
         src_input = open_input(argv[1]);

@@ -8,8 +8,10 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <exception>
 #include <cstdlib>
 #include <cassert>
+#include <climits>
 using namespace std;
 typedef unsigned int uint;
 
@@ -29,6 +31,7 @@ extern int size_of[];
 
 
 //program level global declaration
+extern int errcnt;
 extern bool flg_lexonly;
 extern bool flg_syxonly;
 extern bool flg_tbl;
@@ -62,6 +65,7 @@ void genasm();
 void WARNING(string msg);
 void ERROR(string msg);
 void FATAL_ERROR(string msg);
+void handler();
 
 
 template <typename T>

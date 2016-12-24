@@ -45,3 +45,40 @@
 1480523590 source:e:\学习资料\大三上\编译技术\作业\hcc\semantics.cpp
 	"stdafx.h"
 
+1480537419 source:e:\学习资料\大三上\编译技术\作业\hcc\genasm.cpp
+	"stdafx.h"
+
+1480868330 source:e:\hcc\lex.cpp
+	"stdafx.h"
+
+1481299954 e:\hcc\stdafx.h
+	<iostream>
+	<fstream>
+	<sstream>
+	<iomanip>
+	<string>
+	<vector>
+	<map>
+	<exception>
+	<cstdlib>
+	<cassert>
+	<climits>
+	"semantics.h"
+
+1482587748 e:\hcc\semantics.h
+
+1481300052 source:e:\hcc\main.cpp
+	"stdafx.h"
+
+1482586961 source:e:\hcc\syntax.cpp
+	"stdafx.h"
+
+1481300019 source:e:\hcc\util.cpp
+	"stdafx.h"
+
+1482588196 source:e:\hcc\semantics.cpp
+	"stdafx.h"
+
+1482587911 source:e:\hcc\genasm.cpp
+	"stdafx.h"
+

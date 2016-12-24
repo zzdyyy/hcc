@@ -4,15 +4,15 @@ vector<tblitem> glbtbl;//global symbol table
 vector<string> strtbl;//string table
 vector<funcitem> functbl;//function table
 
-qoperand foundopr = qoperand{ qoperand::GLB_OBJ, -1 };//found result by findidt()
+qoperand foundopr = qoperand{ qoperand::GLB_OBJ, -1, int_t };//found result by findidt()
 int context = -1;//the function context (index of functbl), <0 means not in a function context
-int size_of[] = { 0, 4, 1 };//the size of void_t, int_t, char_t and string_t
+int size_of[] = { 0, 4, 4 };//the size of void_t, int_t, char_t and string_t
 
 //variables used only in this source file
 int local_addr = 0;//address offset of object in stack frame
 int llblc = 0;//local label counter
 int ltmpc = 0;//local temp variable counter
-const qoperand BLANKOP = qoperand{qoperand::BLANK, 0};
+const qoperand BLANKOP = qoperand{qoperand::BLANK, 0, int_t};
 
 //found: findglb==index>=0 ; not found: findglb<0
 int findglb(const string &nm)
@@ -40,14 +40,16 @@ bool findidt(const string &nm)
         idx = findlcl(nm);
         if(idx >= 0)//found in local
         {
-            foundopr = qoperand{qoperand::LCL_OBJ, idx};
+            foundopr = qoperand{qoperand::LCL_OBJ, idx,
+                functbl.at(context).lcltbl.at(idx).datatype};
             return true;
         }
     }
     idx = findglb(nm);
     if(idx >= 0)//found in global
     {
-        foundopr = qoperand{qoperand::GLB_OBJ, idx};
+        foundopr = qoperand{qoperand::GLB_OBJ, idx,
+            glbtbl.at(idx).datatype};
         return true;
     }
     if(nm!="scanf" && nm!="printf")
@@ -75,7 +77,6 @@ bool insertobj(int objtyp, const string& nm, int typ, bool isarray, int val)
     {
         if(findglb(nm)>=0)//found object in table
         {
-            tbl_dump();
             ERROR("Multi definition: " + nm);
             return false;
         }
@@ -86,7 +87,7 @@ bool insertobj(int objtyp, const string& nm, int typ, bool isarray, int val)
     {
         if(findlcl(nm)>=0)
         {
-            tbl_dump();
+            //tbl_dump();
             ERROR("Multi definition: " + nm);
             return false;
         }
@@ -94,6 +95,8 @@ bool insertobj(int objtyp, const string& nm, int typ, bool isarray, int val)
         int sz = size_of[typ];
         local_addr = (local_addr + sz - 1) / sz * sz;//set align
         functbl[context].lcltbl.push_back(tblitem{objtyp, nm, typ, isarray, val, local_addr});
+        if(isarray)
+            functbl[context].lcltbl.back().addr += sz*val-sz;
         if(isarray)
             local_addr += sz*val;
         else
@@ -108,7 +111,7 @@ bool insertpara(int typ, const string &nm)
     assert(context >= 0);//in a function context
     if(findlcl(nm)>=0)
     {
-        tbl_dump();
+        //tbl_dump();
         ERROR("Multi definition: " + nm);
         return false;
     }
@@ -123,7 +126,10 @@ void buildcontext(int rettyp, const string& nm)
     assert(context < 0);
     int idx = functbl.size();
     if(!insertobj(tblitem::FUNCTION, nm, rettyp, false, idx))
-        ;//TODO: throw a exception out to function declaration
+    {
+        //ERROR("Id redefined.");
+        exit(EXIT_FAILURE);
+    }//TODO: throw a exception out to function declaration
 
     functbl.push_back(funcitem{int(glbtbl.size())-1, 0, 0, 0,});
     context = idx;
@@ -146,14 +152,14 @@ void emitqi(const qi &q)
     functbl[context].qilist.push_back(q);
 }
 
-qoperand newtmp()
+qoperand newtmp(int type)
 {
-    return qoperand{qoperand::TMP, ltmpc++};
+    return qoperand{qoperand::TMP, ltmpc++, type};
 }
 
 qoperand newlabel()
 {
-    return qoperand{qoperand::LABEL, llblc++};
+    return qoperand{qoperand::LABEL, llblc++, int_t};
 }
 
 qoperand arrayload(qoperand arropr, qoperand index)
@@ -161,7 +167,7 @@ qoperand arrayload(qoperand arropr, qoperand index)
     tblitem &item = getitem(arropr);
     if(! item.isarray)
         ERROR("Not an array: "+item.name);
-    qoperand element = newtmp();
+    qoperand element = newtmp(arropr.datatype);
     emitqi(qi{qi::ARRAYLOAD, arropr, index, element});
     return element;
 }
@@ -189,7 +195,7 @@ qoperand muldiv(int op, qoperand f1, qoperand f2)
     /*if( (f1.type==qoperand::GLB_OBJ || f1.type==qoperand::GLB_OBJ) && getitem(f1).isarray
        || (f2.type==qoperand::GLB_OBJ || f2.type==qoperand::GLB_OBJ) && getitem(f2).isarray)
         ERROR("Factor cannot be an array.");*///already checked in factor()
-    qoperand f = newtmp();
+    qoperand f = newtmp(int_t);
     if(op == multop)
         emitqi(qi{qi::MUL, f1, f2, f});
     else
@@ -199,7 +205,7 @@ qoperand muldiv(int op, qoperand f1, qoperand f2)
 
 qoperand addsub(int op, qoperand t1, qoperand t2)
 {
-    qoperand t = newtmp();
+    qoperand t = newtmp(int_t);
     if(op == addop)
         emitqi(qi{qi::ADD, t1, t2, t});
     else
@@ -209,7 +215,7 @@ qoperand addsub(int op, qoperand t1, qoperand t2)
 
 qoperand neg(qoperand t)
 {
-    qoperand t1 = newtmp();
+    qoperand t1 = newtmp(int_t);
     emitqi(qi{qi::NEG, t, BLANKOP, t1});
     return t1;
 }
@@ -221,13 +227,24 @@ void push(qoperand arg)
 
 qoperand call(qoperand func)
 {
-    qoperand ret = newtmp();
+    qoperand ret = newtmp(func.datatype);
     emitqi(qi{qi::CALL, func, BLANKOP, ret});
     return ret;
 }
 
 void ret(bool withvalue, qoperand value)
 {
+    if(withvalue)
+    {
+        if(glbtbl.at((functbl.at(context).index)).datatype == void_t)
+            ERROR("Return statement with value found in void function.");
+    }
+    else
+    {
+        if(glbtbl.at((functbl.at(context).index)).datatype != void_t)
+            WARNING("Return statement without value found in non-void function.");
+    }
+
     if(withvalue)
         emitqi(qi{qi::RET, value, BLANKOP, BLANKOP});
     else
@@ -273,10 +290,10 @@ void jmp(qoperand lbl)
 void rd(qoperand opr)
 {
     tblitem &item = getitem(opr);
+    if(item.objtype != tblitem::VAR)
+        ERROR("Can only read into a variable, rather than: "+item.name);
     if(item.isarray)
         ERROR("Cannot read into an array: "+item.name);
-    if(item.objtype == tblitem::CONST)
-        ERROR("Cannot read into a constant: "+item.name);
     emitqi(qi{qi::RD, opr, BLANKOP, BLANKOP});
 }
 
@@ -284,7 +301,7 @@ qoperand insertstr(const string &str)
 {
     int idx = strtbl.size();
     strtbl.push_back(str);
-    return qoperand{qoperand::STRING, idx};
+    return qoperand{qoperand::STRING, idx, string_t};
 }
 
 void wr(qoperand opr)
@@ -320,10 +337,13 @@ string qotostr(qoperand qo)
     //cout<<"debug:"<<qo.type<<","<<qo.value<<endl;
     switch(qo.type)
     {
-    case qoperand::IMDCHAR:
-        return "\'"+string(1, char(qo.value))+"\'";
-    case qoperand::IMDINT:
-        return tostr(qo.value);
+    case qoperand::IMD:
+        if(qo.datatype == char_t)
+            return "\'"+string(1, char(qo.value))+"\'";
+        else if(qo.datatype == int_t)
+            return tostr(qo.value);
+        else
+            assert(0);
     case qoperand::GLB_OBJ:
     case qoperand::LCL_OBJ:
         return getitem(qo).name;

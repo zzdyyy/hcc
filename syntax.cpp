@@ -129,11 +129,19 @@ void program()
             if(istype())//begins with type
                 declheader(true, step);
             else
+            {
                 ERROR("Expected declaration.");
+                do{ gettoken(); }while(!(tkntyp==const_tk || tkntyp==void_tk || istype()));
+            }
         }
     }
     checkmain();
     syx_out("Program read finished.");
+    if(errcnt!=0)
+    {
+        cerr << "hcc terminated due to the error(s) before." << endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 //read constant definition. assuming tkntyp == const_tk
@@ -226,6 +234,7 @@ void declheader(bool allowfunc, int &step)
         {
             ERROR("Function cannot be defined here.");
             do { gettoken(); } while (tkntyp != rprt_tk);   //jump paralist
+            //gettoken();
             if(tkntyp == lbrc_tk)
                 do { gettoken(); } while (tkntyp != rbrc_tk);   //jump function body
             gettoken();
@@ -389,6 +398,8 @@ void paralist(int &paraamt)
 
         if(tkntyp == comma_tk)
             gettoken();
+        else if(tkntyp != rprt_tk)
+            WARNING("Expected comma.");
     }
     gettoken();
 }
@@ -527,9 +538,9 @@ qoperand factor()
         {
             constant(type, value);
             if(type == char_t)
-                return qoperand{qoperand::IMDCHAR, value};
+                return qoperand{qoperand::IMD, value, char_t};
             else
-                return qoperand{qoperand::IMDINT, value};
+                return qoperand{qoperand::IMD, value, int_t};
         }
 
     default:
@@ -566,13 +577,15 @@ void arglist(int argn)
         ++argc;
         if(argc > argn)
         {
-            WARNING("Arguments are too many compared with the declaration: "+tostr(argn));
-            break;
+            ERROR("Arguments are too many compared with the declaration: "+tostr(argn));
+            break;//TODO: jumps to post ) or ;
         }
         args.push_back(arg);
 
         if(tkntyp == comma_tk)
-            gettoken();//TODO: may cause that , is not needed
+            gettoken();
+        else if(tkntyp != rprt_tk)
+            WARNING("Expected comma.");
     }
     if(argc < argn)
         ERROR("Arguments less than declaration: "+tostr(argn));
@@ -630,7 +643,13 @@ void statement()
 
     default:
         if(tkntyp != id_tk)
+        {
             ERROR("Not a valid statement.");
+            do{ gettoken(); }while(!(tkntyp==id_tk || tkntyp==if_tk || tkntyp==while_tk ||
+                                     tkntyp==return_tk || tkntyp==switch_tk || tkntyp==semicln_tk ||
+                                     tkntyp==lbrc_tk || tkntyp==rbrc_tk));
+            return;
+        }
         if(tknstr == "printf")
             printf_stmt();
         else if(tknstr == "scanf")
@@ -745,9 +764,9 @@ void switch_stmt()
         //SMT
         qoperand v;
         if(type == char_t)
-            v = qoperand{qoperand::IMDCHAR, value};
+            v = qoperand{qoperand::IMD, value, char_t};
         else
-            v = qoperand{qoperand::IMDINT, value};
+            v = qoperand{qoperand::IMD, value, int_t};
         setlabel(lblnext); lblnext = newlabel();
         jifnot(eqlop, e, v, lblnext);
 
@@ -790,6 +809,8 @@ void return_stmt()
 
     if(tkntyp != semicln_tk)
     {
+        if(tkntyp!=lprt_tk)
+            WARNING("Return value not in parentheses.");
         retval = expression();
         ret_with_value = true;
     }
@@ -810,23 +831,34 @@ void printf_stmt()
         ERROR("Expected left parenthesis.");
     gettoken();
 
+    int argcnt = 0;
+    bool strexp[2];
     while(tkntyp !=rprt_tk)
     {
         if(tkntyp == strlit_tk)
         {
+            strexp[argcnt%2] = true;
             qoperand str = insertstr(tknstr);
             wr(str);//SMT
             gettoken();
         }
         else
         {
+            strexp[argcnt%2] = false;
             qoperand e = expression();
             wr(e);//SMT
         }
+        ++argcnt;
 
         if(tkntyp == comma_tk)
             gettoken();
+        else if(tkntyp != rprt_tk)
+            WARNING("Expected comma.");
     }
+    if(argcnt <1 || argcnt>2)
+        WARNING("Non-standard use of printf()");
+    if(argcnt == 2 && !(strexp[0] && !strexp[1]))
+        WARNING("Non-standard use of printf(<string>, <expression>)");
 
     gettoken();
 
@@ -855,6 +887,8 @@ void scanf_stmt()
 
         if(tkntyp == comma_tk)
             gettoken();
+        else if(tkntyp != rprt_tk)
+            WARNING("Expected comma.");
 
     }while(tkntyp == id_tk);
 
