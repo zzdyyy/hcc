@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <exception>
 #include <cstdlib>
 #include <cassert>
 #include <climits>
@@ -64,6 +65,7 @@ void genasm();
 void WARNING(string msg);
 void ERROR(string msg);
 void FATAL_ERROR(string msg);
+void handler();
 
 
 template <typename T>

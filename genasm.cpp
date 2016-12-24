@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
-#define PRINTF_NEWLINE
-#undef PRINTF_NEWLINE
+//#define PRINTF_NEWLINE
 
 
 static ostringstream out;
@@ -67,7 +66,7 @@ void gendataseg()
 //                      para -> DWORD PTR [ebp+12]
 string addrstr(qoperand qo)
 {
-    if(qo.type == qoperand::IMDCHAR || qo.type == qoperand::IMDINT)
+    if(qo.type == qoperand::IMD)
         return tostr(qo.value);
 
     if(qo.type == qoperand::TMP)//temp local var
@@ -130,7 +129,7 @@ void gencodeseg()
         for(tblitem &cti: functbl[context].lcltbl)
         {
             if(cti.objtype == tblitem::CONST)
-                out << "    mov   "<<addrstr(qoperand{qoperand::LCL_OBJ, i})
+                out << "    mov   "<<addrstr(qoperand{qoperand::LCL_OBJ, i, cti.datatype})
                     << ", " << cti.value <<endl;
             ++i;
         }
@@ -155,10 +154,11 @@ void gencodeseg()
                 else
                 {
                     out << "    mov   eax, " << addrstr(q.A) << endl;
-                    if(q.A.type == qoperand::IMDCHAR ||
-                       ((q.A.type == qoperand::LCL_OBJ || q.A.type == qoperand::GLB_OBJ) && getitem(q.A).datatype == char_t ))
+                    assert(q.A.type == qoperand::IMD || q.A.type == qoperand::LCL_OBJ
+                           || q.A.type == qoperand::GLB_OBJ || q.A.type == qoperand::TMP);
+                    if(q.A.datatype == char_t)
                         out<<"    invoke crt_printf,addr fmtc,eax"<<endl;
-                    else
+                    else if(q.A.datatype == int_t)
                         out<<"    invoke crt_printf,addr fmtd,eax"<<endl;
                 }
                 #ifdef PRINTF_NEWLINE
