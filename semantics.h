@@ -20,11 +20,12 @@ extern vector<string> strtbl;//string table
 
 struct qoperand
 {
-    enum opr_t { IMDINT, IMDCHAR, GLB_OBJ, LCL_OBJ, TMP, LABEL, BLANK, STRING };
+    enum opr_t { IMD, GLB_OBJ, LCL_OBJ, TMP, LABEL, BLANK, STRING };
 
     int type;   //the type of the operand, one of opr_t
     int value;  //value of immediate number; index of object in table;
                 //No. of temp variables; No. of label
+    int datatype;//the data type of the operand, one of type_t
 };
 
 struct qi
@@ -81,8 +82,8 @@ void checkmain();
 static inline tblitem &getitem(qoperand opr)
 {
     return (opr.type == qoperand::GLB_OBJ)?
-            glbtbl[opr.value]:
-            functbl[context].lcltbl[opr.value];
+            glbtbl.at(opr.value):
+            functbl.at(context).lcltbl.at(opr.value);
 }
 
 #endif // SEMANTICS_H_INCLUDED

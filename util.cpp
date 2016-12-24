@@ -27,4 +27,7 @@ void FATAL_ERROR(string msg)
     exit(EXIT_FAILURE);
 }
 
-
+void handler()
+{
+    exit(EXIT_FAILURE);
+}
