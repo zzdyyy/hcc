@@ -368,6 +368,7 @@ void tbl_dump()
     ostream &out = *tbl_output;
 
     out << "Global table:" << endl;
+    out << "     ObjTyp        Name    T  A  Value Addr" << endl;
     for(auto it: glbtbl)
         out << "    "
             << setw(2) << it.objtype << "  "

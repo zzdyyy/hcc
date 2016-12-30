@@ -858,7 +858,7 @@ void printf_stmt()
     if(argcnt <1 || argcnt>2)
         WARNING("Non-standard use of printf()");
     if(argcnt == 2 && !(strexp[0] && !strexp[1]))
-        WARNING("Non-standard use of printf(<string>, <expression>)");
+        WARNING("Non-standard use of printf()");
 
     gettoken();
 

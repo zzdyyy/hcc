@@ -35,6 +35,7 @@ extern int errcnt;
 extern bool flg_lexonly;
 extern bool flg_syxonly;
 extern bool flg_tbl;
+extern bool flg_opt;
 extern istream *src_input;
 extern ostream *lex_output;
 extern ostream *syx_output;
