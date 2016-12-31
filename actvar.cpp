@@ -1,16 +1,7 @@
 #include "stdafx.h"
+#define BBLOCK_DEBUG
 #define ACTVAR_DEBUG
 
-struct bblk
-{
-    int id=-1;//block number
-    int entrance=-1;//entrance address
-    int exit=-1;//exit address
-    vector<int> from;
-    vector<int> to;
-
-    bblk(int theid, int theentrance): id(theid), entrance(theentrance) {}
-};
 vector<vector<bblk> > bblktbl;
 
 bool isjmp(qi &q)
@@ -18,7 +9,7 @@ bool isjmp(qi &q)
     switch(q.op)
     {
     case qi::JEQ: case qi::JGE: case qi::JGT: case qi::JLE:
-    case qi::JLT: case qi::JMP: case qi::JZ: case qi::JNE:
+    case qi::JLT: case qi::JNE: case qi::JMP: case qi::JZ:
     case qi::RET:
         return true;
     default:
@@ -65,7 +56,8 @@ void push_back_nr(vector<int> &vec, int val)
     vec.push_back(val);
 }
 
-void buildbblk()
+//build basic block for all functions
+void buildbblks()
 {
     //clear bblktbl
     vector<vector<bblk> > newbblktbl(functbl.size(), vector<bblk>());
@@ -147,7 +139,7 @@ void buildbblk()
         }
         push_back_nr(bblks[0].from,-1);//begin->block0
 
-#ifdef ACTVAR_DEBUG
+#ifdef BBLOCK_DEBUG
         cerr<<"BBLOCKs in "<<glbtbl[functbl[ct].index].name<<"():"<<endl;
         for(bblk b : bblks)
         {
@@ -159,6 +151,151 @@ void buildbblk()
                 cerr << setw(4) <<t;
             cerr<<"  ]"<<endl;
         }
-#endif // ACTVAR_DEBUG
+#endif // BBLOCK_DEBUG
     }
 }
+
+#ifdef ACTVAR_DEBUG
+string actset2str(set<int> &theset, funcitem &func)
+{
+    ostringstream o;
+    for(int i: theset)
+        o<<func.lcltbl[i].name<<" ";
+    return "{"+o.str()+"}";
+}
+#endif // ACTVAR_DEBUG
+
+void actvar(funcitem &func, vector<bblk> &bblks, actvartbl &answer)
+{
+    vector<qi> &qilist = func.qilist;
+    int bblkn = bblks.size();
+
+    vector<set<int>> uses(bblkn, set<int>());
+    vector<set<int>> defs(bblkn, set<int>());
+    vector<set<int>> ins(bblkn, set<int>());
+    vector<set<int>> outs(bblkn, set<int>());
+
+    //fill in use and def
+    for(int n=0; n<bblkn; ++n)//for each bblocks
+    {
+        bblk &b = bblks[n];
+        set<int> &use=uses[n];
+        set<int> &def=defs[n];
+
+        for(int m=b.entrance; m<=b.exit; ++m)//for each qi in bblocks
+        {
+            qi &q = qilist[m];
+            //use
+            switch(q.op)
+            {
+            case qi::ASSIGN: case qi::NEG:
+            case qi::JZ: case qi::RET:
+            case qi::PUSH: case qi::WR:
+                if(q.A.type == qoperand::LCL_OBJ &&
+                   def.find(q.A.value)==def.end())
+                    use.insert(q.A.value);
+            }
+            switch(q.op)
+            {
+            case qi::ADD: case qi::SUB:
+            case qi::DIV: case qi::MUL: //binary arithmatic
+            case qi::JEQ: case qi::JGE: case qi::JGT: case qi::JLE:
+            case qi::JLT: case qi::JNE: //binary cmp
+                if(q.A.type == qoperand::LCL_OBJ &&
+                   def.find(q.A.value)==def.end())
+                    use.insert(q.A.value);
+                if(q.B.type == qoperand::LCL_OBJ &&
+                   def.find(q.B.value)==def.end())
+                    use.insert(q.B.value);
+            }
+            switch(q.op)
+            {
+            case qi::ARRAYASS:
+                if(q.D.type == qoperand::LCL_OBJ &&
+                   def.find(q.D.value)==def.end())
+                    use.insert(q.D.value);
+            case qi::ARRAYLOAD:
+                if(q.B.type == qoperand::LCL_OBJ &&
+                   def.find(q.B.value)==def.end())
+                    use.insert(q.B.value);
+            }
+
+            //def
+            switch(q.op)
+            {
+            case qi::ASSIGN: case qi::NEG://unary arithmetic
+            case qi::ADD: case qi::SUB:
+            case qi::DIV: case qi::MUL: //binary arithmetic
+            case qi::ARRAYLOAD: case qi::CALL:
+                if(q.D.type == qoperand::LCL_OBJ &&
+                   use.find(q.D.value)==use.end())
+                    def.insert(q.D.value);
+                break;
+            case qi::RD:
+                if(q.A.type == qoperand::LCL_OBJ &&
+                   use.find(q.A.value)==use.end())
+                    def.insert(q.A.value);
+            }
+
+        }
+    }
+
+    //loop and expand sets by flow
+    bool flag=true;//need another loop?
+    int num;
+    while(flag)
+    {
+        flag = false;
+        for(int n=bblkn-1; n>=0; --n)//for each bblocks
+        {
+            bblk &b = bblks[n];
+            set<int> &use=uses[n];
+            set<int> &def=defs[n];
+            set<int> &in=ins[n];
+            set<int> &out=outs[n];
+
+            //`out` = Union( `in` of every `to` )
+            num=out.size();
+            for(int i: b.to)
+            {
+                if(i>=0)
+                    out.insert(ins[i].begin(), ins[i].end());
+            }
+            if(out.size()-num>0)//changed
+                flag = true;
+
+            //`in` = (`out` - `def`) union `use`
+            in.clear();
+            in.insert(out.begin(), out.end());
+            for(int a: def)
+            {
+                auto iter = in.find(a);
+                if(iter!=in.end())
+                    in.erase(iter);
+            }
+            in.insert(use.begin(), use.end());
+        }
+    }
+
+    #ifdef ACTVAR_DEBUG
+    cerr<<"//////////////////////////////////"<<endl;
+    cerr<<"Active varible of function "<<glbtbl[func.index].name<<"()"<<endl;
+    cerr<<setw(4)<<"BLK"<<setw(15)<<"def"<<setw(15)<<"use"<<setw(15)<<"in"<<setw(15)<<"out"<<endl;
+    for(int n=0; n<bblkn; ++n)
+        cerr<<setw(4)<<n<<setw(15)<<actset2str(defs[n],func)
+            <<setw(15)<<actset2str(uses[n],func)
+            <<setw(15)<<actset2str(ins[n],func)
+            <<setw(15)<<actset2str(outs[n],func)<<endl;
+    cerr<<"//////////////////////////////////"<<endl;
+    #endif // ACTVAR_DEBUG
+
+    answer.use.swap(uses);
+    answer.def.swap(defs);
+    answer.in.swap(ins);
+    answer.out.swap(outs);
+}
+
+
+
+
+

@@ -51,7 +51,7 @@
 1482590941 source:e:\hcc\lex.cpp
 	"stdafx.h"
 
-1483151278 e:\hcc\stdafx.h
+1483182850 e:\hcc\stdafx.h
 	<iostream>
 	<fstream>
 	<sstream>
@@ -59,35 +59,39 @@
 	<string>
 	<vector>
 	<map>
+	<set>
 	<exception>
 	<cstdlib>
 	<cassert>
 	<climits>
 	"semantics.h"
+	"actvar.h"
 
-1483115814 e:\hcc\semantics.h
+1483167558 e:\hcc\semantics.h
 
-1483102634 source:e:\hcc\main.cpp
+1483167558 source:e:\hcc\main.cpp
 	"stdafx.h"
 
-1483066390 source:e:\hcc\syntax.cpp
+1483167558 source:e:\hcc\syntax.cpp
 	"stdafx.h"
 
 1482590941 source:e:\hcc\util.cpp
 	"stdafx.h"
 
-1483152061 source:e:\hcc\semantics.cpp
+1483167558 source:e:\hcc\semantics.cpp
 	"stdafx.h"
 
 1482590941 source:e:\hcc\genasm.cpp
 	"stdafx.h"
 
-1483117057 source:e:\hcc\opt.cpp
+1483183508 source:e:\hcc\opt.cpp
 	"stdafx.h"
 
-1483116450 source:e:\hcc\opt_dag.cpp
+1483167558 source:e:\hcc\opt_dag.cpp
 	"stdafx.h"
 
-1483152796 source:e:\hcc\actvar.cpp
+1483183911 source:e:\hcc\actvar.cpp
 	"stdafx.h"
+
+1483187556 e:\hcc\actvar.h
 

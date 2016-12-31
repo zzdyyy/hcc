@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <exception>
 #include <cstdlib>
 #include <cassert>
@@ -54,6 +55,9 @@ extern string tknstr;  //string literal, identifier name
 //semantics level declaration
 #include "semantics.h"
 
+//optimization level declaration
+#include "actvar.h"
+
 void lex_init();
 void gettoken();
 void lex_dump();
@@ -63,7 +67,6 @@ void program();
 
 void optimize();
 void opt_DAG();
-void buildbblk();
 
 void genasm();
 
