@@ -137,6 +137,15 @@ void buildcontext(int rettyp, const string& nm)
     ltmpc = 0;
 }
 
+//load stored context. notice that this will not load llblc so newlabel()
+//can not be used
+void loadcontext(int ct)
+{
+    context = ct;
+    local_addr = functbl[context].varsize;
+    ltmpc = functbl[context].tmpamt;
+}
+
 void exitcontext()
 {
     assert(context >= 0);
@@ -362,8 +371,8 @@ string qotostr(qoperand qo)
 void tbl_dump()
 {
     string mnemo[] = {
-        "ADD", "SUB", "NEG", "MUL", "DIV", "JLT", "JGT", "JLE", "JGE", "JEQ", "JNE", "JZ", "JMP",
-        "ASSIGN", "ARRAYLOAD", "ARRAYASS", "PUSH", "CALL", "RD", "WR", "RET", "LABEL",
+        "+  ", "-  ", "=- ", "*  ", "/  ", "j< ", "j> ", "j<=", "j>=", "j= ", "j!=", "j0 ", "j  ",
+        "=  ", "[] ", "=[] ", "PUSH", "CALL", "RD ", "WR ", "RET", "LABEL",
     };
     ostream &out = *tbl_output;
 
@@ -400,15 +409,17 @@ void tbl_dump()
                 << setw(4) << it.value << "  "
                 << it.addr << endl;
         out << "Quaternary:" << endl;
+        int qicnt=0;
         for(qi q : fi.qilist)
         {
             /*out<<"debug:"<<q.op<<","<<q.A.type<<","<<q.A.value<<","
                 <<q.B.type<<","<<q.B.value<<","
                 <<q.D.type<<","<<q.D.value<<endl;*/
+            out << setw(3) << qicnt++;
             if(q.op == qi::LABEL)
-                out << "    L" << q.A.value << ":" << endl;
+                out << "   L" << q.A.value << ":" << endl;
             else
-                out << "    "
+                out << "   "
                     << setw(9) << mnemo[q.op] << ", "
                     << setw(6) << qotostr(q.A) << ", "
                     << setw(6) << qotostr(q.B) << ", "

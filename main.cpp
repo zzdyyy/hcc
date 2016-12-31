@@ -154,7 +154,8 @@ int main(int argc, char **argv)
     //optimization
     if(flg_opt)
     {
-        cerr << "optimization is opened" << endl;
+        optimize();
+        //TODO
         if(flg_tbl)
         {
             tbl_dump();

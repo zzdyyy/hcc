@@ -33,9 +33,12 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="actvar.cpp" />
 		<Unit filename="genasm.cpp" />
 		<Unit filename="lex.cpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="opt.cpp" />
+		<Unit filename="opt_dag.cpp" />
 		<Unit filename="semantics.cpp" />
 		<Unit filename="semantics.h" />
 		<Unit filename="stdafx.h">

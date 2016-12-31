@@ -51,7 +51,7 @@
 1482590941 source:e:\hcc\lex.cpp
 	"stdafx.h"
 
-1483095318 e:\hcc\stdafx.h
+1483151278 e:\hcc\stdafx.h
 	<iostream>
 	<fstream>
 	<sstream>
@@ -65,9 +65,9 @@
 	<climits>
 	"semantics.h"
 
-1482590941 e:\hcc\semantics.h
+1483115814 e:\hcc\semantics.h
 
-1482590941 source:e:\hcc\main.cpp
+1483102634 source:e:\hcc\main.cpp
 	"stdafx.h"
 
 1483066390 source:e:\hcc\syntax.cpp
@@ -76,9 +76,18 @@
 1482590941 source:e:\hcc\util.cpp
 	"stdafx.h"
 
-1483068606 source:e:\hcc\semantics.cpp
+1483103865 source:e:\hcc\semantics.cpp
 	"stdafx.h"
 
 1482590941 source:e:\hcc\genasm.cpp
+	"stdafx.h"
+
+1483117057 source:e:\hcc\opt.cpp
+	"stdafx.h"
+
+1483116450 source:e:\hcc\opt_dag.cpp
+	"stdafx.h"
+
+1483151838 source:e:\hcc\actvar.cpp
 	"stdafx.h"
 

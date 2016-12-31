@@ -61,6 +61,10 @@ void lex_dump();
 void syx_init();
 void program();
 
+void optimize();
+void opt_DAG();
+void buildbblk();
+
 void genasm();
 
 void WARNING(string msg);

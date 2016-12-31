@@ -26,6 +26,12 @@ struct qoperand
     int value;  //value of immediate number; index of object in table;
                 //No. of temp variables; No. of label
     int datatype;//the data type of the operand, one of type_t
+
+    bool operator== (const qoperand &o) const { return (type==o.type && value==o.value); }
+    bool operator< (const qoperand &o) const
+    {
+        return ((type!=o.type)? (type<o.type): (value<o.value));
+    }
 };
 
 struct qi
@@ -60,7 +66,9 @@ bool isfunction(const string &idt);
 bool insertobj(int objtyp, const string& nm, int typ, bool isarray, int val=0);
 bool insertpara(int typ, const string &nm);
 void buildcontext(int rettyp, const string& nm);
+void loadcontext(int ct);
 void exitcontext();
+qoperand newtmp(int type);
 qoperand arrayload(qoperand arropr, qoperand index);
 void arrayass(qoperand arr, qoperand index, qoperand val);
 void assign(qoperand var, qoperand val);
@@ -85,5 +93,6 @@ static inline tblitem &getitem(qoperand opr)
             glbtbl.at(opr.value):
             functbl.at(context).lcltbl.at(opr.value);
 }
+string qotostr(qoperand qo);
 
 #endif // SEMANTICS_H_INCLUDED
