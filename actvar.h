@@ -13,6 +13,7 @@ struct bblk
 };
 extern vector<vector<bblk> > bblktbl;
 
+//the av table of a function, give a bblk number and get a set
 struct actvartbl
 {
     vector<set<int> > use;

@@ -38,7 +38,7 @@ struct qi
 {
     enum oprt_t {
         ADD, SUB, NEG, MUL, DIV, JLT, JGT, JLE, JGE, JEQ, JNE, JZ, JMP,
-        ASSIGN, ARRAYLOAD, ARRAYASS, PUSH, CALL, RD, WR, RET, LABEL,
+        ASSIGN, ARRAYLOAD, ARRAYASS, PUSH, CALL, RD, WR, RET, LABEL, NOP,
     };
     int op;
     qoperand A, B, D;

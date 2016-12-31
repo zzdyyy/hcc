@@ -372,7 +372,7 @@ void tbl_dump()
 {
     string mnemo[] = {
         "+  ", "-  ", "=- ", "*  ", "/  ", "j< ", "j> ", "j<=", "j>=", "j= ", "j!=", "j0 ", "j  ",
-        "=  ", "[] ", "=[] ", "PUSH", "CALL", "RD ", "WR ", "RET", "LABEL",
+        "=  ", "[] ", "=[] ", "PUSH", "CALL", "RD ", "WR ", "RET", "LABEL", "",
     };
     ostream &out = *tbl_output;
 
