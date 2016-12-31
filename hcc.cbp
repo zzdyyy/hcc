@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters=" - " />
+				<Option parameters="-t - C:\masm32\test\calc.c -o" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
