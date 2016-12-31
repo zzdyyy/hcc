@@ -1,6 +1,4 @@
 #include "stdafx.h"
-#define BBLOCK_DEBUG
-#define ACTVAR_DEBUG
 
 vector<vector<bblk> > bblktbl;
 
@@ -139,7 +137,7 @@ void buildbblks()
         }
         push_back_nr(bblks[0].from,-1);//begin->block0
 
-#ifdef BBLOCK_DEBUG
+        if(flg_debug){
         cerr<<"BBLOCKs in "<<glbtbl[functbl[ct].index].name<<"():"<<endl;
         for(bblk b : bblks)
         {
@@ -151,11 +149,11 @@ void buildbblks()
                 cerr << setw(4) <<t;
             cerr<<"  ]"<<endl;
         }
-#endif // BBLOCK_DEBUG
+        cerr<<endl;
+        }
     }
 }
 
-#ifdef ACTVAR_DEBUG
 string actset2str(set<int> &theset, funcitem &func)
 {
     ostringstream o;
@@ -163,7 +161,6 @@ string actset2str(set<int> &theset, funcitem &func)
         o<<func.lcltbl[i].name<<" ";
     return "{"+o.str()+"}";
 }
-#endif // ACTVAR_DEBUG
 
 void actvar(funcitem &func, vector<bblk> &bblks, actvartbl &answer)
 {
@@ -277,17 +274,18 @@ void actvar(funcitem &func, vector<bblk> &bblks, actvartbl &answer)
         }
     }
 
-    #ifdef ACTVAR_DEBUG
-    cerr<<"//////////////////////////////////"<<endl;
-    cerr<<"Active varible of function "<<glbtbl[func.index].name<<"()"<<endl;
+
+    if(flg_debug){
+    cerr<<"Active varible of function "<<glbtbl[func.index].name<<"():"<<endl;
     cerr<<setw(4)<<"BLK"<<setw(15)<<"def"<<setw(15)<<"use"<<setw(15)<<"in"<<setw(15)<<"out"<<endl;
     for(int n=0; n<bblkn; ++n)
         cerr<<setw(4)<<n<<setw(15)<<actset2str(defs[n],func)
             <<setw(15)<<actset2str(uses[n],func)
             <<setw(15)<<actset2str(ins[n],func)
             <<setw(15)<<actset2str(outs[n],func)<<endl;
-    cerr<<"//////////////////////////////////"<<endl;
-    #endif // ACTVAR_DEBUG
+    cerr<<endl;
+    }
+
 
     answer.use.swap(uses);
     answer.def.swap(defs);

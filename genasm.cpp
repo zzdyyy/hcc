@@ -260,6 +260,9 @@ void gencodeseg()
                 out<<"    mov   "<<addrstr(q.D)<<", eax"<<endl;
                 break;
 
+            case qi::NOP:
+                break;
+
             default:
                 assert(0);
             }

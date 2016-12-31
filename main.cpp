@@ -4,6 +4,10 @@ bool flg_lexonly = false;
 bool flg_syxonly = false;
 bool flg_tbl = false;
 bool flg_opt = false;
+bool flg_no_dag = false;
+bool flg_no_reduce = false;
+bool flg_debug = false;
+bool flg_glbreg = false;
 istream *src_input = nullptr;
 ostream *lex_output = nullptr;
 ostream *syx_output = nullptr;
@@ -13,7 +17,7 @@ ostream *asm_output = nullptr;
 void usage()
 {
     cout << "Usage: hcc [-c FILENAME|-l FILENAME|-s FILENAME|" << endl
-        << "            -t FILENAME] [-o] SOURCEFILE" << endl
+        << "            -t FILENAME] [-o] [-D] [-R] [-r] [-d] SOURCEFILE" << endl
         << endl
         << "       Read extended C0 source code from SOURCEFILE file and compile" << endl
         << "       to MASM source code. The generated code will be output into" << endl
@@ -35,8 +39,12 @@ void usage()
         << "       Do semantic analysis and dump the relevant tables to FILENAME." << endl
         << "       Assign FILENAME as - to indicate std-out." << endl
         << endl
-        << "  -o" <<endl
-        << "       Do optimization to generate more concise code." << endl
+        << "  -o   Perform optimization." << endl
+        << "  -D   Do NOT use DAG to simplify repeated expression." << endl
+        << "  -R   Do NOT use reduce code using data flow, redundant deletion, copy-." << endl
+        << "       spread, or constant combination." << endl
+        << "  -r   Use global register." << endl
+        << "  -d   Output verbose debug information." << endl
         << endl;
     exit(EXIT_FAILURE);
 }
@@ -122,6 +130,30 @@ int main(int argc, char **argv)
             if(flg_opt)
                 usage();
             flg_opt = true;
+        }
+        else if(arg == "-D")
+        {
+            if(flg_no_dag)
+                usage();
+            flg_no_dag = true;
+        }
+        else if(arg == "-R")
+        {
+            if(flg_no_reduce)
+                usage();
+            flg_no_reduce = true;
+        }
+        else if(arg == "-r")
+        {
+            if(flg_glbreg)
+                usage();
+            flg_glbreg = true;
+        }
+        else if(arg == "-d")
+        {
+            if(flg_debug)
+                usage();
+            flg_debug = true;
         }
         else
         {
