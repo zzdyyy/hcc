@@ -159,7 +159,7 @@ string actset2str(set<int> &theset, funcitem &func)
     ostringstream o;
     for(int i: theset)
         o<<func.lcltbl[i].name<<" ";
-    return "{"+o.str()+"}";
+    return "{ "+o.str()+"}";
 }
 
 void actvar(funcitem &func, vector<bblk> &bblks, actvartbl &answer)

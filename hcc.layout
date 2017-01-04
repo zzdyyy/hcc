@@ -1,41 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="genasm.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
+	<File name="opt.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="682" topLine="15" />
-		</Cursor>
-	</File>
-	<File name="semantics.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="7803" topLine="261" />
-		</Cursor>
-	</File>
-	<File name="semantics.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1517" topLine="9" />
-		</Cursor>
-	</File>
-	<File name="opt_dag.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2497" topLine="83" />
+			<Cursor1 position="472" topLine="0" />
 		</Cursor>
 		<Folding>
-			<Collapse line="19" />
-			<Collapse line="36" />
-			<Collapse line="55" />
-			<Collapse line="77" />
+			<Collapse line="3" />
+			<Collapse line="25" />
+			<Collapse line="132" />
+			<Collapse line="199" />
 		</Folding>
 	</File>
-	<File name="lex.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
+	<File name="genasm.cpp" open="1" top="1" tabpos="11" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="361" topLine="0" />
+			<Cursor1 position="5026" topLine="155" />
 		</Cursor>
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4252" topLine="94" />
+			<Cursor1 position="1014" topLine="24" />
 		</Cursor>
+	</File>
+	<File name="actvar.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="396" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="semantics.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="903" topLine="6" />
+		</Cursor>
+	</File>
+	<File name="actvar.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4585" topLine="16" />
+		</Cursor>
+		<Folding>
+			<Collapse line="5" />
+			<Collapse line="18" />
+			<Collapse line="31" />
+			<Collapse line="49" />
+			<Collapse line="58" />
+		</Folding>
 	</File>
 	<File name="syntax.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
 		<Cursor>
@@ -46,27 +53,36 @@
 			<Collapse line="85" />
 		</Folding>
 	</File>
-	<File name="stdafx.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
+	<File name="semantics.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1827" topLine="12" />
+			<Cursor1 position="4539" topLine="150" />
 		</Cursor>
 	</File>
-	<File name="actvar.cpp" open="1" top="1" tabpos="11" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
+	<File name="opt_dag.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1013" topLine="30" />
+			<Cursor1 position="5960" topLine="4" />
 		</Cursor>
 		<Folding>
-			<Collapse line="16" />
+			<Collapse line="36" />
+			<Collapse line="55" />
+			<Collapse line="77" />
+			<Collapse line="95" />
+			<Collapse line="136" />
 		</Folding>
 	</File>
-	<File name="opt.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="59" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="util.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
+	<File name="util.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="191" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="lex.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="361" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="stdafx.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1280" topLine="18" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

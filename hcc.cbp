@@ -34,6 +34,7 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="actvar.cpp" />
+		<Unit filename="actvar.h" />
 		<Unit filename="genasm.cpp" />
 		<Unit filename="lex.cpp" />
 		<Unit filename="main.cpp" />
