@@ -1,0 +1,71 @@
+Finally designed BNF
+
+1. lexical level
+
+1.1 operators & primitive character
+
+<addsub_tk>  ::=    + | -
+<multdiv_tk> ::=    * | /
+<rltop_tk>   ::=    < | <= | > | >= | != | ==
+
+<non-zero digit>    ::=     1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+<digit>             ::=     0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+<letter>            ::=     _ | a | ... | z | A | ... | Z
+
+1.2 comlicate types
+
+<chrlit_tk> ::= '<addsub_tk>' | '<multdiv_tk>' | '<letter>' | '<digit>'
+<strlit_tk> ::= "{<support character, aka. a character whose ASCII code is 32, 33 or 35-126, according to the assignment requirement>}"
+<intlit_tk> ::= <non-zero digit> {<digit>}
+<id_tk>     ::= <letter> {<letter> | <digit>}
+
+
+
+2. syntax level
+
+2.1 simple elements
+
+<nvtype>   ::= char | int
+<integer>  ::= {+ | -} <intlit_tk> | 0
+
+
+2.2 statements
+
+<program>  ::= {<constdef> | void <funcdeftail> | <declheader> <funcdeftail> | <declheader> <vardeftail>)}
+
+<constdef> ::= const <nvtype> <id>=<constant> {,<id>=<constant>} ;
+<constant> ::= <integer> | <charlit>
+
+<declheader>  ::= <nvtype> id
+<vardeftail>  ::= ; | ‘[’ <intlit_tk> ‘]’ {, id | , id ‘[’ <intlit_tk> ‘]’} ;
+<funcdeftail> ::= id ‘(’ [<paralist>]  ‘)’ ‘{’ <cmpdstmts> ‘}’
+<paralist>    ::= <nvtype> <id> {,<nvtype> <id>}
+
+<cmpdstmts>      ::= [<constdef>] [<declheader> <vardeftail>] <statement list>
+<statement list> ::= {<statement>}
+<statement>      ::= <if_stmt> | <while_stmt> | <switch_stmt>
+                     | <funccall>;  | <assign_stmt>; | <scanf_stmt>;
+                     | <printf_stmt>; | <return_stmt>; |  ‘{’<statement list>‘}’ | ;
+
+<condition> ::= <expression> <rltop_tk> <expression> | <expression>
+<if_stmt> ::= if ‘(’ <condition> ‘)’ <statement>
+<while_stmt> ::= while ‘(’ <condition> ‘)’ <statement>
+<switch_stmt> ::= switch ‘(’<expression>‘)’ ‘{’<switch list> [default: <statement>] ‘}’
+<switch list> ::= case<constant>：<statement> { case<constant>：<statement> }
+
+<return_stmt> ::= return <expression> ; | return;
+
+
+<arglist>     ::= <expression> {,<expression>} | <empty>
+<funccall>    ::= <id> ‘(’ <arglist> ‘)’
+<printf_stmt> ::= printf ‘(’ <arglist> ‘)’
+<scanf_stmt>  ::= scanf  ‘(’ <arglist> ‘)’
+<assign_stmt> ::= <id> = <expression> | <id> ‘[’ <expression> ‘]’ = <expression>
+
+2.3 expressions
+
+<expression>    ::= <addsub_tk> <term> { <addsub_tk> <term> }
+<term>          ::= <factor> { <multdiv_tk> <factor> }
+<factor>        ::= <id> | <id> ‘[’ <expression> ‘]’ | ‘(’ <expression> ‘)’
+                     | <integer> | <chrlit_tk> | <funccall>
+
