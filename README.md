@@ -95,7 +95,7 @@ g++ -std=c++11  -c opt_dag.cpp    -o obj\Debug\opt_dag.o
 g++ -std=c++11  -c semantics.cpp  -o obj\Debug\semantics.o
 g++ -std=c++11  -c syntax.cpp     -o obj\Debug\syntax.o
 g++ -std=c++11  -c util.cpp       -o obj\Debug\util.o
-g++ -o bin/Debug/hcc.exe obj/Debug/*.o
+g++ -o bin\Debug\hcc.exe obj\Debug\*.o
 ```
 
 ### Test samples
