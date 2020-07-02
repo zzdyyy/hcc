@@ -24,3 +24,16 @@ bin/Debug/hcc : obj/Debug/actvar.o obj/Debug/genasm.o obj/Debug/lex.o obj/Debug/
 clean :
 	rm obj/Debug/*.o
 	rm bin/Debug/hcc
+
+check:
+	bin/Debug/hcc tests/multitest.c >/dev/null
+	bin/Debug/hcc tests/1.ascii.c >/dev/null
+	bin/Debug/hcc tests/2.calc.c >/dev/null
+	bin/Debug/hcc tests/3.fibo.c >/dev/null
+	bin/Debug/hcc tests/4.opt.c >/dev/null
+	bin/Debug/hcc tests/5.syn.c >/dev/null
+
+	! bin/Debug/hcc tests/7.calc_err.c >/dev/null
+	! bin/Debug/hcc tests/8.fibo_err.c >/dev/null
+	! bin/Debug/hcc tests/9.opt_err.c >/dev/null
+	! bin/Debug/hcc tests/10.syn_err.c >/dev/null
